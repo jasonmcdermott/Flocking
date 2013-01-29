@@ -43,4 +43,8 @@
         <name>Size</name>
         <value>766.000000000</value>
     </SliderFloat_Size>
+    <Toggle_Interact_with_Bodies>
+        <name>Interact with Bodies</name>
+        <value>0</value>
+    </Toggle_Interact_with_Bodies>
 </controls>

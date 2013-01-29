@@ -23,7 +23,7 @@ public:
     string a;
     ofVec3f outerTemp;
     float separationF, alignF, cohesionF, dragF, mass;
-    bool reset, isDead;
+    bool reset, isDead, interactWithBodies;
     int age;
     
     Boid() {
@@ -52,6 +52,7 @@ public:
         separationF = 1;
         cohesionF = 1;
         dragF = 0.95;
+        interactWithBodies = true;
     }
     
     void run(vector <Boid> boids, Boundary outer, vector <ofxBody> bodies) {
@@ -61,29 +62,22 @@ public:
         if (isDead != true) {
             a = "";
             age ++;
-            interactWithBodies(bodies);
+            if (interactWithBodies == true) {
+                interactingBodies(bodies);
+            }
             if (avoidWalls) {
                 avoidBounds(outer);
                 killStrays(outer);
             } else {
                 checkBounds(outer);
             }
-    //            ageBoids();
-    //        ofVec3f avo;
-    //        avo = avoidBounds(outer);
-    //        avo *= 2;
-    //        acc += avo;
-    //        a += " av is: " + ofToString(pos.x,2) + " , " + ofToString(pos.y,2) + " , " + ofToString(pos.z,2) +  " \n";
-    //        a += " av is: " + ofToString(avLeft.x,2) + " , " + ofToString(avLeft.y,2) + " , " + ofToString(avLeft.z,2) +  " \n";
-
-
             flock(boids);
             move();
         }
     }
     
     
-    void interactWithBodies(vector <ofxBody> bodies) {
+    void interactingBodies(vector <ofxBody> bodies) {
         for (int i=0;i<bodies.size();i++) {
             if (bodies[i].charge == 0) {             // be attracted to global attractors
                 ofVec3f att;
@@ -109,10 +103,8 @@ public:
                 force = rep - pos;
                 float dist = force.length();
                 float inverseSquare = (mass * bodies[i].mass) / (dist * dist);
-                //                    force.normalize();
                 if (dist < mass * 300) {
                     force *= inverseSquare;
-//                    force = -force;
                     acc += -force;
                 }
             }
@@ -151,9 +143,8 @@ public:
             ofTranslate(pos.x,pos.y,pos.z);
 
             
-            ofSetColor(c);
-            drawSphere(60,sc);
-//            ofBox(0,0,0,sc);
+            ofSetColor(255);
+            ofBox(0,0,0,sc);
 //            ofPoint(0,0,0);
 //            glutSolidSphere(sc, 60, 60);
 
@@ -245,19 +236,16 @@ public:
         return steer;
     }
     
-    //avoid. If weight == true avoidance vector is larger the closer the boid is to the target
+
     ofVec3f avoid(ofVec3f target, bool weight) {
         ofVec3f steer;
         steer.set(pos);
         steer -= target;
         float distance = steer.length();
-        //steering vector points away from target
-//        steer.set(-steer);
         if (weight) {
             steer *= (1 / (distance * distance));
         }
         steer *= 15;
-//        steer.limit(maxSteerForce); //limits the steering force to maxSteerForce
         return steer;
     }
     
@@ -351,51 +339,7 @@ public:
     
     
     
-    GLfloat vdata[12][3] = {
-        {-X, 0.0, Z}, {X, 0.0, Z}, {-X, 0.0, -Z}, {X, 0.0, -Z},
-        {0.0, Z, X}, {0.0, Z, -X}, {0.0, -Z, X}, {0.0, -Z, -X},
-        {Z, X, 0.0}, {-Z, X, 0.0}, {Z, -X, 0.0}, {-Z, -X, 0.0}
-    };
     
-    GLuint tindices[20][3] = {
-        {0,4,1}, {0,9,4}, {9,5,4}, {4,5,8}, {4,8,1},
-        {8,10,1}, {8,3,10}, {5,3,8}, {5,2,3}, {2,7,3},
-        {7,10,3}, {7,6,10}, {7,11,6}, {11,0,6}, {0,1,6},
-        {6,1,10}, {9,0,11}, {9,11,2}, {9,2,5}, {7,2,11} };
-    
-    void normalize(GLfloat *a) {
-        GLfloat d=sqrt(a[0]*a[0]+a[1]*a[1]+a[2]*a[2]);
-        a[0]/=d; a[1]/=d; a[2]/=d;
-    }
-    
-    void drawTri(GLfloat *a, GLfloat *b, GLfloat *c, int div, float r) {
-        if (div<=0) {
-            glNormal3fv(a); glVertex3f(a[0]*r, a[1]*r, a[2]*r);
-            glNormal3fv(b); glVertex3f(b[0]*r, b[1]*r, b[2]*r);
-            glNormal3fv(c); glVertex3f(c[0]*r, c[1]*r, c[2]*r);
-        } else {
-            GLfloat ab[3], ac[3], bc[3];
-            for (int i=0;i<3;i++) {
-                ab[i]=(a[i]+b[i])/2;
-                ac[i]=(a[i]+c[i])/2;
-                bc[i]=(b[i]+c[i])/2;
-            }
-            normalize(ab); normalize(ac); normalize(bc);
-            drawTri(a, ab, ac, div-1, r);
-            drawTri(b, bc, ab, div-1, r);
-            drawTri(c, ac, bc, div-1, r);
-            drawTri(ab, bc, ac, div-1, r);  //<--Comment this line and sphere looks really cool!
-        }
-    }
-    
-    void drawSphere(int ndiv, float radius) {
-
-        for (int i=0;i<20;i++)
-            drawTri(vdata[tindices[i][0]], vdata[tindices[i][1]], vdata[tindices[i][2]], ndiv, radius);
-
-    }
-    
-
 };
 
 

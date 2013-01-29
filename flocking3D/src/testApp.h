@@ -6,6 +6,8 @@
 #include "ofxSimpleGuiToo.h"
 #include "ofCamera.h"
 #include "ofxBody.h"
+#include "Predator.h"
+
 #define ATTRACT 0
 #define REPEL 1
 
@@ -35,21 +37,15 @@ class testApp : public ofBaseApp{
     float time, tick;
     
     bool guiDraw;
-    bool	avoidWalls;
+
     
     ofCamera cam;
-//    bool	myBool2;
-//    bool	myBool3;
-//    bool	myBool4;
-//    bool	myBool5;
-//    bool	myBool6;
-//    bool	myBool7;
-//    bool	myBool8;
-//    bool	myBool9;
+
     vector <ofxBody> bodies;
+    vector <Predator> predators;
+    bool	reset, avoidWalls, interactWithBodies;
     float separationF, cohesionF, alignF, dragF, personalSpace, perception, maxForce, maxSpeed;
     float worldSize;
-    bool reset;
     bool camDraw;
     
 };

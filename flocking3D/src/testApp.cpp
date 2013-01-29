@@ -29,7 +29,7 @@ void testApp::setup(){
     bodies.push_back(ofxBody( ofVec3f(centre), 90, ATTRACT));
     outer.setDims(centre,worldSize);
     
-    
+//    predators.push_back(Predator(0, outer, centre));
     flock.addBoids(200, outer, centre);
     
     gui.loadFromXML();
@@ -44,6 +44,9 @@ void testApp::update(){
     time ++;
     if (time > tick) {
         updateGUI();
+        for (int i=0;i<predators.size();i++) {
+//            predators[i].run(flock.boids, outer);
+        }
         flock.update(outer, bodies);
         if (reset == true) {
             reset = false;
@@ -60,14 +63,15 @@ void testApp::draw(){
         cam.begin();
         cam.draw();
     }
-
-	// draw world axis
-	ofDrawAxis(100);
+    
     for (int i=0;i<bodies.size();i++) {
-//        bodies[i].draw();
+        bodies[i].draw();
     }
     outer.draw();
     flock.draw();
+    for (int i=0;i<predators.size();i++) {
+//        predators[i].render();
+    }
     if (camDraw) {
         cam.end();
     }
@@ -87,6 +91,7 @@ void testApp::updateGUI() {
     flock.maxForce = maxForce;
     flock.maxSpeed = maxSpeed;
     flock.reset = reset;
+    flock.interactWithBodies = interactWithBodies;
 
     outer.updateGUI();
     flock.updateGUI();
@@ -110,6 +115,8 @@ void testApp::setupGUI() {
     gui.addTitle("World").setNewColumn(true);
     gui.addSlider("Size",worldSize,100,1000);
     
+    gui.addTitle("Interaction");
+    gui.addToggle("Interact with Bodies", interactWithBodies);
     
     //	gui.addSlider("myInt1", myInt1, 100, 200);
     //	gui.addComboBox("box1", box1, 12, NULL);
@@ -123,8 +130,8 @@ void testApp::keyPressed(int key){
     if (key == 'g') {
         guiDraw = !guiDraw;
     }
-
 }
+
 void testApp::keyReleased(int key){}
 void testApp::mouseMoved(int x, int y){}
 void testApp::mouseDragged(int x, int y, int button){}
@@ -133,3 +140,4 @@ void testApp::mouseReleased(int x, int y, int button){}
 void testApp::windowResized(int w, int h){}
 void testApp::gotMessage(ofMessage msg){}
 void testApp::dragEvent(ofDragInfo dragInfo){}
+

@@ -9,7 +9,7 @@ public:
     vector <Boid> boids;
     float col;
     int boidCount;
-    bool avoidWalls, reset;
+    bool    avoidWalls, interactWithBodies, reset;
     float separationF, cohesionF, alignF, dragF, personalSpace, perception, maxForce, maxSpeed;
     
     Flock() {
@@ -48,6 +48,7 @@ public:
             boids[i].maxForce = maxForce;
             boids[i].maxSpeed = maxSpeed;
             boids[i].reset = reset;
+            boids[i].interactWithBodies = interactWithBodies;
         }
     }
     
