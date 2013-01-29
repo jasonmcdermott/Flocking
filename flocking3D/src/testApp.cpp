@@ -7,34 +7,26 @@ void testApp::setup(){
     tick = 0.01;
     ofBackground(0);
     
+    
     personalSpace = 1;
     guiDraw = false;
     worldSize = 400;
     
-    gui.addTitle("Boids");
-	gui.addToggle("Avoid Walls", avoidWalls);
-	gui.addSlider("Separation", separationF, 0, 5);
-	gui.addSlider("Cohesion", cohesionF, 0, 5);
-	gui.addSlider("Alignment", alignF, 0, 5);
-    gui.addSlider("Perception", perception, 1, 500);
-    gui.addSlider("PersonalSpace", personalSpace, 1, 100);
-    gui.addSlider("Turning Force", maxForce, 0.1, 5);
-    gui.addSlider("Speed", maxSpeed, 0.1, 5);
-    gui.addSlider("Drag", dragF, 0.1, 1);
-    gui.addToggle("Reset Boids", reset);
-    
-    gui.addTitle("World").setNewColumn(true);
-    gui.addSlider("Size",worldSize,100,1000);
+    cam.resetTransform();
+    cam.setFov(60);
+    cam.clearParent();
+    cam.setPosition(ofGetWidth()/2, ofGetHeight()/2, worldSize*2);
+    cam.roll(90);
+    camDraw = true;
 
     
-    //	gui.addSlider("myInt1", myInt1, 100, 200);
-//	gui.addComboBox("box1", box1, 12, NULL);
-//	gui.addButton("Randomize Background", randomizeButton);
-//	gui.addColorPicker("BG Color", aColor);
 
+
+    setupGUI();
     
     
     centre.set(ofGetWidth()/2,ofGetHeight()/2,0);
+    bodies.push_back(ofxBody( ofVec3f(centre), 90, ATTRACT));
     outer.setDims(centre,worldSize);
     
     
@@ -48,10 +40,11 @@ void testApp::setup(){
 
 
 void testApp::update(){
+    glEnable(GL_DEPTH_TEST);
     time ++;
     if (time > tick) {
         updateGUI();
-        flock.update(outer);
+        flock.update(outer, bodies);
         if (reset == true) {
             reset = false;
         }
@@ -62,9 +55,22 @@ void testApp::update(){
 
 
 void testApp::draw(){
-    
+    // activate camera
+    if (camDraw) {
+        cam.begin();
+        cam.draw();
+    }
+
+	// draw world axis
+	ofDrawAxis(100);
+    for (int i=0;i<bodies.size();i++) {
+//        bodies[i].draw();
+    }
     outer.draw();
     flock.draw();
+    if (camDraw) {
+        cam.end();
+    }
     if (guiDraw) gui.draw();
 
 }
@@ -87,6 +93,31 @@ void testApp::updateGUI() {
 
 }
 
+
+void testApp::setupGUI() {
+    gui.addTitle("Boids");
+	gui.addToggle("Avoid Walls", avoidWalls);
+	gui.addSlider("Separation", separationF, 0, 15);
+	gui.addSlider("Cohesion", cohesionF, 0, 5);
+	gui.addSlider("Alignment", alignF, 0, 5);
+    gui.addSlider("Perception", perception, 1, 500);
+    gui.addSlider("PersonalSpace", personalSpace, 1, 100);
+    gui.addSlider("Turning Force", maxForce, 0.1, 5);
+    gui.addSlider("Speed", maxSpeed, 0.1, 5);
+    gui.addSlider("Drag", dragF, 0.1, 1);
+    gui.addToggle("Reset Boids", reset);
+    
+    gui.addTitle("World").setNewColumn(true);
+    gui.addSlider("Size",worldSize,100,1000);
+    
+    
+    //	gui.addSlider("myInt1", myInt1, 100, 200);
+    //	gui.addComboBox("box1", box1, 12, NULL);
+    //	gui.addButton("Randomize Background", randomizeButton);
+    //	gui.addColorPicker("BG Color", aColor);
+    
+
+}
 
 void testApp::keyPressed(int key){
     if (key == 'g') {

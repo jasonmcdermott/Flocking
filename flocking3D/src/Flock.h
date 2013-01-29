@@ -1,6 +1,7 @@
 #pragma once
 #include "Boid.h"
 #include "Boundary.h"
+#include "ofxBody.h"
 
 class Flock {
 public:
@@ -15,16 +16,18 @@ public:
         
     }
     
-    void update(Boundary outer) {
+    void update(Boundary outer, vector <ofxBody> bodies) {
         for(int i=0;i<boids.size();i++) {
-            boids[i].run(boids, outer);
+            boids[i].run(boids, outer, bodies);
         }
     }
     
     void draw() {
+        glBegin(GL_TRIANGLES);
         for(int i=0;i<boids.size();i++) {
             boids[i].render();
         }
+        glEnd();
     }
     
     void addBoids(int n, Boundary outer, ofVec3f centre) {

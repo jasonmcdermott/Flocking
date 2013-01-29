@@ -122,6 +122,7 @@
 		0E2F3C4116B7770100C73B23 /* tinyxmlparser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tinyxmlparser.cpp; sourceTree = "<group>"; };
 		0E2F3C4316B7770100C73B23 /* ofxXmlSettings.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxXmlSettings.cpp; sourceTree = "<group>"; };
 		0E2F3C4416B7770100C73B23 /* ofxXmlSettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxXmlSettings.h; sourceTree = "<group>"; };
+		0E2F3C8316B797A500C73B23 /* ofxBody.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxBody.h; sourceTree = "<group>"; };
 		0EFB1D0016B4D43800FC10BA /* Flock.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Flock.h; sourceTree = "<group>"; };
 		0EFB1D0116B4D43E00FC10BA /* Boid.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Boid.h; sourceTree = "<group>"; };
 		0EFB1D0216B4D68600FC10BA /* Boundary.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Boundary.h; sourceTree = "<group>"; };
@@ -358,6 +359,7 @@
 		E4B69E1C0A3A1BDC003C02F2 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				0E2F3C8316B797A500C73B23 /* ofxBody.h */,
 				0EFB1D0216B4D68600FC10BA /* Boundary.h */,
 				0EFB1D0016B4D43800FC10BA /* Flock.h */,
 				0EFB1D0116B4D43E00FC10BA /* Boid.h */,

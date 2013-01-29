@@ -36,7 +36,7 @@ public:
         ofLine(a,b);
         ofLine(a,d);
         ofLine(a,e);
-        
+            
         // B
         ofLine(b,c);
         ofLine(b,f);
@@ -57,6 +57,14 @@ public:
         
         // G
         ofLine(g,h);
+        
+        ofSetColor(255,0,0);
+        ofSphere(a,10);
+        ofSetColor(0,255,0);
+        ofSphere(d,10);
+        
+
+
         
 //        ofPopMatrix();
     }
