@@ -3,6 +3,7 @@
 #include "ofMain.h"
 #include "Flock.h"
 #include "Boundary.h"
+#include "ofxSimpleGuiToo.h"
 
 class testApp : public ofBaseApp{
 	public:
