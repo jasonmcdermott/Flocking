@@ -19,14 +19,10 @@ public:
     void setDims(ofVec3f centre_, float length_) {
         centre.set(centre_);
         length = length_;
-        halfLength = length / 2;        
-//        offset.set(ofGetWidth()/2-length/2,ofGetHeight()/2-length/2,0);
         reset();
     }
     
-    void updateLength(float length_) {
-        length = length_;
-
+    void updateGUI() {
         reset();
     }
     
@@ -66,7 +62,7 @@ public:
     }
     
     void reset() {
-
+        halfLength = length / 2;        
         a.set(centre.x-halfLength,centre.y-halfLength,centre.z+halfLength);
         b.set(centre.x+halfLength,centre.y-halfLength,centre.z+halfLength);
         c.set(centre.x+halfLength,centre.y-halfLength,centre.z-halfLength);

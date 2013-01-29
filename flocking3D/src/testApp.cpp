@@ -9,7 +9,9 @@ void testApp::setup(){
     
     personalSpace = 1;
     guiDraw = false;
-//    gui.addTitle("A group");
+    worldSize = 400;
+    
+    gui.addTitle("Boids");
 	gui.addToggle("Avoid Walls", avoidWalls);
 	gui.addSlider("Separation", separationF, 0, 5);
 	gui.addSlider("Cohesion", cohesionF, 0, 5);
@@ -20,6 +22,9 @@ void testApp::setup(){
     gui.addSlider("Speed", maxSpeed, 0.1, 5);
     gui.addSlider("Drag", dragF, 0.1, 1);
     gui.addToggle("Reset Boids", reset);
+    
+    gui.addTitle("World").setNewColumn(true);
+    gui.addSlider("Size",worldSize,100,1000);
 
     
     //	gui.addSlider("myInt1", myInt1, 100, 200);
@@ -30,7 +35,7 @@ void testApp::setup(){
     
     
     centre.set(ofGetWidth()/2,ofGetHeight()/2,0);
-    outer.setDims(centre,200);
+    outer.setDims(centre,worldSize);
     
     
     flock.addBoids(200, outer, centre);
@@ -65,6 +70,8 @@ void testApp::draw(){
 }
 
 void testApp::updateGUI() {
+    outer.length = worldSize;
+    
     flock.avoidWalls = avoidWalls;
     flock.separationF = separationF;
     flock.cohesionF = cohesionF;
@@ -74,7 +81,10 @@ void testApp::updateGUI() {
     flock.maxForce = maxForce;
     flock.maxSpeed = maxSpeed;
     flock.reset = reset;
+
+    outer.updateGUI();
     flock.updateGUI();
+
 }
 
 

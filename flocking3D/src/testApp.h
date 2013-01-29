@@ -41,6 +41,7 @@ class testApp : public ofBaseApp{
 //    bool	myBool9;
     
     float separationF, cohesionF, alignF, dragF, personalSpace, perception, maxForce, maxSpeed;
+    float worldSize;
     bool reset;
     
 };

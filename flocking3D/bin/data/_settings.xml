@@ -5,38 +5,42 @@
     </Toggle_Avoid_Walls>
     <SliderFloat_Separation>
         <name>Separation</name>
-        <value>2.725000143</value>
+        <value>1.000000000</value>
     </SliderFloat_Separation>
     <SliderFloat_Cohesion>
         <name>Cohesion</name>
-        <value>0.900000036</value>
+        <value>2.075000048</value>
     </SliderFloat_Cohesion>
     <SliderFloat_Alignment>
         <name>Alignment</name>
-        <value>0.974999964</value>
+        <value>1.800000072</value>
     </SliderFloat_Alignment>
     <SliderFloat_Perception>
         <name>Perception</name>
-        <value>55.889999390</value>
+        <value>13.475000381</value>
     </SliderFloat_Perception>
     <SliderFloat_PersonalSpace>
         <name>PersonalSpace</name>
-        <value>10.404999733</value>
+        <value>6.940000057</value>
     </SliderFloat_PersonalSpace>
     <SliderFloat_Turning_Force>
         <name>Turning Force</name>
-        <value>0.467500001</value>
+        <value>0.197999999</value>
     </SliderFloat_Turning_Force>
     <SliderFloat_Speed>
         <name>Speed</name>
-        <value>1.006500006</value>
+        <value>1.398499966</value>
     </SliderFloat_Speed>
     <SliderFloat_Drag>
         <name>Drag</name>
-        <value>1.000000000</value>
+        <value>0.923500001</value>
     </SliderFloat_Drag>
     <Toggle_Reset_Boids>
         <name>Reset Boids</name>
         <value>0</value>
     </Toggle_Reset_Boids>
+    <SliderFloat_Size>
+        <name>Size</name>
+        <value>739.000000000</value>
+    </SliderFloat_Size>
 </controls>

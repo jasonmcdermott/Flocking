@@ -28,14 +28,15 @@ public:
     
     Boid(int ID_, Boundary outer, ofVec3f centre_) {
         origin.set(centre_);
-        origin.set(origin.x + ofRandom(-outer.halfLength,outer.halfLength),origin.y + ofRandom(-outer.halfLength,outer.halfLength),origin.z+ ofRandom(-outer.halfLength,outer.halfLength));
+        origin.set(origin.x + ofRandom(-outer.halfLength/2,outer.halfLength/2),origin.y + ofRandom(-outer.halfLength/2,outer.halfLength/2),origin.z+ ofRandom(-outer.halfLength/2,outer.halfLength/2));
         ID = ID_;
-        isDead = false;
-        age = 0;
+
         initBoid();
     }
 
     void initBoid() {
+        isDead = false;
+        age = 0;
         pos.set(origin);
         vel.set(0,0,0);
         acc.set(0,0,0);
@@ -49,29 +50,30 @@ public:
     }
     
     void run(vector <Boid> boids, Boundary outer) {
-        a = "";
-        age ++;
         if (reset == true) {
             initBoid();
         }
-        if (avoidWalls) {
-            avoidBounds(outer);
-            resetStrays();
-        } else {
-            checkBounds(outer);
+        if (isDead != true) {
+            a = "";
+            age ++;
+            if (avoidWalls) {
+                avoidBounds(outer);
+                killStrays(outer);
+            } else {
+                checkBounds(outer);
+            }
+    //            ageBoids();
+    //        ofVec3f avo;
+    //        avo = avoidBounds(outer);
+    //        avo *= 2;
+    //        acc += avo;
+    //        a += " av is: " + ofToString(pos.x,2) + " , " + ofToString(pos.y,2) + " , " + ofToString(pos.z,2) +  " \n";
+    //        a += " av is: " + ofToString(avLeft.x,2) + " , " + ofToString(avLeft.y,2) + " , " + ofToString(avLeft.z,2) +  " \n";
+
+
+            flock(boids);
+            move();
         }
-        
-//        ofVec3f avo;
-//        avo = avoidBounds(outer);
-//        avo *= 2;
-//        acc += avo;
-//        a += " av is: " + ofToString(pos.x,2) + " , " + ofToString(pos.y,2) + " , " + ofToString(pos.z,2) +  " \n";
-//        a += " av is: " + ofToString(avLeft.x,2) + " , " + ofToString(avLeft.y,2) + " , " + ofToString(avLeft.z,2) +  " \n";
-
-
-        flock(boids);
-        move();
-
     }
     
     void flock(vector <Boid> boids) {
@@ -99,48 +101,49 @@ public:
     
     
     void render() {
-        
-        ofPushMatrix();
-        ofTranslate(pos.x,pos.y,pos.z);
+        if (isDead != true) {
+            ofPushMatrix();
+            ofTranslate(pos.x,pos.y,pos.z);
 
-        
-        ofSetColor(c);
-        ofBox(0,0,0,sc);
+            
+            ofSetColor(c);
+            ofBox(0,0,0,sc);
 
-        
-//        ofDrawBitmapString(a,pos.x+5,pos.y+5,pos.z);
-//        ofRotateY(atan2(-vel.z,vel.x));
-//        ofRotateZ(asin(vel.y/vel.length()));
-//        ofSetColor(255);
-//        //draw bird
-//        glBegin(GL_TRIANGLE_FAN);
-//        glVertex3f(3*sc,0,0);
-//        glVertex3f(-3*sc,2*sc,0);
-//        glVertex3f(-3*sc,-2*sc,0);
-//
-//        glVertex3f(3*sc,0,0);
-//        glVertex3f(-3*sc,2*sc,0);
-//        glVertex3f(-3*sc,0,2*sc);
-//
-//        glVertex3f(3*sc,0,0);
-//        glVertex3f(-3*sc,0,2*sc);
-//        glVertex3f(-3*sc,-2*sc,0);
-//
-//        /* wings
-//         vertex(2*sc,0,0);
-//         vertex(-1*sc,0,0);
-//         vertex(-1*sc,-8*sc,flap);
-//         
-//         vertex(2*sc,0,0);
-//         vertex(-1*sc,0,0);
-//         vertex(-1*sc,8*sc,flap);
-//         */
-//        
-//        glVertex3f(-3*sc,0,2*sc);
-//        glVertex3f(-3*sc,2*sc,0);
-//        glVertex3f(-3*sc,-2*sc,0);
-//        glEnd();
-        ofPopMatrix();
+            
+    //        ofDrawBitmapString(a,pos.x+5,pos.y+5,pos.z);
+    //        ofRotateY(atan2(-vel.z,vel.x));
+    //        ofRotateZ(asin(vel.y/vel.length()));
+    //        ofSetColor(255);
+    //        //draw bird
+    //        glBegin(GL_TRIANGLE_FAN);
+    //        glVertex3f(3*sc,0,0);
+    //        glVertex3f(-3*sc,2*sc,0);
+    //        glVertex3f(-3*sc,-2*sc,0);
+    //
+    //        glVertex3f(3*sc,0,0);
+    //        glVertex3f(-3*sc,2*sc,0);
+    //        glVertex3f(-3*sc,0,2*sc);
+    //
+    //        glVertex3f(3*sc,0,0);
+    //        glVertex3f(-3*sc,0,2*sc);
+    //        glVertex3f(-3*sc,-2*sc,0);
+    //
+    //        /* wings
+    //         vertex(2*sc,0,0);
+    //         vertex(-1*sc,0,0);
+    //         vertex(-1*sc,-8*sc,flap);
+    //         
+    //         vertex(2*sc,0,0);
+    //         vertex(-1*sc,0,0);
+    //         vertex(-1*sc,8*sc,flap);
+    //         */
+    //        
+    //        glVertex3f(-3*sc,0,2*sc);
+    //        glVertex3f(-3*sc,2*sc,0);
+    //        glVertex3f(-3*sc,-2*sc,0);
+    //        glEnd();
+            ofPopMatrix();
+        }
     }
     
     void checkBounds(Boundary outer) {
@@ -214,15 +217,17 @@ public:
         ofVec3f posSum;
         ofVec3f repulse;
         for(int i=0;i<boids.size();i++) {
-            other.set(boids[i].pos);
-            dist.set(pos);
-            dist -= other;
-            float d = dist.length();
-            if(d > 0 && d <= personalSpace) {
-                repulse.set(dist);
-                repulse.normalize();
-                repulse /= d;
-                posSum += repulse;
+            if (boids[i].ID != ID && boids[i].isDead != true) {
+                other.set(boids[i].pos);
+                dist.set(pos);
+                dist -= other;
+                float d = dist.length();
+                if(d > 0 && d <= personalSpace) {
+                    repulse.set(dist);
+                    repulse.normalize();
+                    repulse /= d;
+                    posSum += repulse;
+                }
             }
         }
         return posSum;
@@ -232,7 +237,7 @@ public:
         ofVec3f velSum;
         int count = 0;
         for(int i=0;i<boids.size();i++){
-            if (boids[i].ID != ID) {
+            if (boids[i].ID != ID && boids[i].isDead != true) {
                 other.set(boids[i].pos);
                 dist.set(pos);
                 dist -= other;
@@ -257,13 +262,15 @@ public:
         steer.set(origin);
         int count = 0;
         for(int i=0;i<boids.size();i++) {
-            other.set(boids[i].pos);
-            dist.set(pos);
-            dist -= other;
-            float d = dist.length();
-            if(d > 0 && d <= perception) {
-                posSum += boids[i].pos;
-                count++;
+            if (boids[i].ID != ID && boids[i].isDead != true) {
+                other.set(boids[i].pos);
+                dist.set(pos);
+                dist -= other;
+                float d = dist.length();
+                if(d > 0 && d <= perception) {
+                    posSum += boids[i].pos;
+                    count++;
+                }
             }
         }
         if(count>0) {
@@ -276,15 +283,22 @@ public:
     }
 
     
-    void updateGUI(bool avoidWalls_, float separationF_, float cohesionF_, float alignF_) {
-        avoidWalls = avoidWalls_;
-        separationF = separationF_;
-        cohesionF = cohesionF_;
-        alignF = alignF_;
+    void killStrays(Boundary outer) {
+        if (pos.x > outer.right.x || pos.x < outer.left.x) {
+            isDead = true;
+        }
+        if (pos.y > outer.bottom.y || pos.y < outer.top.y) {
+            isDead = true;
+        }
+        if (pos.z > outer.front.z || pos.z < outer.back.z) {
+            isDead = true;
+        }
     }
     
-    void resetStrays() {
-        
+    void ageBoids() {
+        if (age > 100) {
+            isDead = true;
+        }
     }
 
 };
