@@ -2,43 +2,46 @@
 #include "Boundary.h"
 #include "ofxBody.h"
 #include <math.h>
-#define X .525731112119133606
-#define Z .850650808352039932
 
 class Boid {
 public:
     
     ofVec3f pos, vel, acc,ali,coh,sep, origin;
-    float personalSpace, perception;
+    float personalSpace, boidPerception, predPerception;
     bool avoidWalls = true;
     ofVec3f other, dist;
     float c;
-    float maxSpeed = 3;
-    float maxForce = .5;
+    float boidSpeed = 3;
+    float predSpeed = 6;
+    float boidForce = .5;
+    float predForce = 0.9;
+    float evadeForce = 1;
     float h;
     float sc = 3;
     float flap = 0;
     float t = 0;
     int ID;
+    int randomPrey;
     string a;
     ofVec3f outerTemp;
     float separationF, alignF, cohesionF, dragF, mass;
-    bool reset, isDead, interactWithBodies;
-    int age;
+    bool isDead, interactWithBodies, interactWithPredators;
+    bool reset = false, updatePrey;
+    int age, type, prey;
     
     Boid() {
         
     }
     
-    Boid(int ID_, Boundary outer, ofVec3f centre_) {
+    Boid(int ID_, Boundary outer, ofVec3f centre_, int type_) {
         origin.set(centre_);
-        origin.set(origin.x + ofRandom(-outer.halfLength,outer.halfLength),origin.y + ofRandom(-outer.halfLength,outer.halfLength),origin.z+ ofRandom(-outer.halfLength,outer.halfLength));
         ID = ID_;
-
-        initBoid();
+        type = type_;
+        initBoid(outer);
     }
 
-    void initBoid() {
+    void initBoid(Boundary outer) {
+        origin.set(origin.x + ofRandom(-outer.halfLength,outer.halfLength),origin.y + ofRandom(-outer.halfLength,outer.halfLength),origin.z+ ofRandom(-outer.halfLength,outer.halfLength));
         isDead = false;
         age = 0;
         mass = 1;
@@ -46,24 +49,44 @@ public:
         vel.set(0,0,0);
         acc.set(0,0,0);
         personalSpace = 15;
-        perception = 50;
         c = 255;
-        alignF = 1;
         separationF = 1;
         cohesionF = 1;
         dragF = 0.95;
-        interactWithBodies = true;
+        a = "";
+
+        if (type == 0) {
+            alignF = 1;
+            interactWithBodies = true;
+            boidPerception = 50;
+            sc = 3;
+        } else {
+            alignF = 0;
+            prey = ofRandom(0,ID);
+            interactWithBodies = false;
+            predPerception = 500;
+            sc = 10;
+        }
     }
     
     void run(vector <Boid> boids, Boundary outer, vector <ofxBody> bodies) {
         if (reset == true) {
-            initBoid();
+            initBoid(outer);
         }
         if (isDead != true) {
-            a = "";
             age ++;
-            if (interactWithBodies == true) {
-                interactingBodies(bodies);
+            if (type == 0) {
+                if (interactWithBodies == true) {
+                    interactingBodies(bodies);
+                }
+            }
+            if (interactWithPredators) {
+                if (type == 1) {
+    //                if (updatePrey == true) {
+                        choosePrey(boids);
+    //                    updatePrey = false;
+    //                }
+                }
             }
             if (avoidWalls) {
                 avoidBounds(outer);
@@ -79,7 +102,7 @@ public:
     
     void interactingBodies(vector <ofxBody> bodies) {
         for (int i=0;i<bodies.size();i++) {
-            if (bodies[i].charge == 0) {             // be attracted to global attractors
+            if (bodies[i].charge == 0) {
                 ofVec3f att;
                 ofVec3f force;
                 att.set(bodies[i].pos);
@@ -111,26 +134,102 @@ public:
         }
     }
 
-    
-    
     void flock(vector <Boid> boids) {
         ali = alignment(boids);
+        sep = separation(boids);
         coh = cohesion(boids);
-        sep = seperation(boids);
         
         ali *= alignF;
-        coh *= cohesionF;
         sep *= separationF;
+        coh *= cohesionF;
         
         acc += ali;
-        acc += coh;
         acc += sep;
+        acc += coh;
         
+        if (interactWithPredators) {
+            if (type == 0) {
+                fleePredators(boids);
+            }
+            if (type == 1) {
+                trailPrey(boids);
+            }
+            gobble(boids);
+        }
     }
     
+    void choosePrey(vector <Boid> boids) {
+        float closest = 500;
+        for (int i=0;i<boids.size();i++) {
+            if (boids[i].isDead == false && boids[i].type == 0) {
+                ofVec3f distance;
+                distance = boids[i].pos - pos;
+                float dist = distance.length();
+                if (dist < closest) {
+                    prey = i;
+                }
+            }
+        }
+    }
+
+    void trailPrey(vector <Boid> boids) {
+        for (int i=0;i<boids.size();i++) {
+            if (boids[prey].type == 0) {
+                ofVec3f att;
+                ofVec3f force;
+                att.set(boids[prey].pos);
+                force = att - pos;
+                float dist = force.length();
+                float inverseSquare = (mass * boids[prey].mass) / (dist * dist);
+                float minDist = (sc + boids[prey].mass);
+                if (dist > minDist) {
+                    force *= inverseSquare;
+                    acc += force;
+                }
+            }
+        }
+    }
+    
+    void fleePredators(vector <Boid> boids) {
+        for (int i=0;i<boids.size();i++) {
+            if (boids[i].ID != ID && boids[i].type == 1) {
+                ofVec3f rep;
+                ofVec3f force;
+                rep.set(boids[i].pos);
+                force = rep - pos;
+                float dist = force.length();
+                float inverseSquare = (mass * boids[i].mass) / (dist * dist);
+                if (dist < personalSpace * 10) {
+                    force *= inverseSquare;
+                    force *= evadeForce;
+                    acc += -force;
+                }
+            }
+        }
+    }
+    
+    void gobble(vector <Boid> boids) {
+        for (int i=0;i<boids.size();i++) {
+            if (isDead == false && type == 0 && boids[i].type == 1) {
+                ofVec3f distance;
+                distance = boids[i].pos - pos;
+                float dist = distance.length();
+                if (dist < sc*3) {
+                    boids[i].updatePrey = true;
+                    isDead = true;
+                }
+            }
+        }
+    }
+
     void move() {
-        vel += acc; //add acceleration to velocity
-        vel.limit(maxSpeed); //make sure the velocity vector magnitude does not exceed maxSpeed
+        vel += acc;
+        if (type == 0){
+            vel.limit(boidSpeed);
+        }
+        if (type == 1) {
+            vel.limit(predSpeed);
+        }
         vel *= dragF; // add a drag force into the mix.
         pos += vel; //add velocity to position
         acc *= 0; //reset acceleration
@@ -141,46 +240,14 @@ public:
         if (isDead != true) {
             ofPushMatrix();
             ofTranslate(pos.x,pos.y,pos.z);
-
-            
-            ofSetColor(255);
+            if (type == 0) {
+                ofSetColor(0,0,200);
+            } else if (type == 1) {
+                ofSetColor(200,0,0);
+                ofDrawBitmapString(ofToString(type,0),5,10);                
+            }
             ofBox(0,0,0,sc);
-//            ofPoint(0,0,0);
-//            glutSolidSphere(sc, 60, 60);
 
-            
-    //        ofDrawBitmapString(a,pos.x+5,pos.y+5,pos.z);
-    //        ofRotateY(atan2(-vel.z,vel.x));
-    //        ofRotateZ(asin(vel.y/vel.length()));
-    //        ofSetColor(255);
-    //        //draw bird
-    //        glBegin(GL_TRIANGLE_FAN);
-    //        glVertex3f(3*sc,0,0);
-    //        glVertex3f(-3*sc,2*sc,0);
-    //        glVertex3f(-3*sc,-2*sc,0);
-    //
-    //        glVertex3f(3*sc,0,0);
-    //        glVertex3f(-3*sc,2*sc,0);
-    //        glVertex3f(-3*sc,0,2*sc);
-    //
-    //        glVertex3f(3*sc,0,0);
-    //        glVertex3f(-3*sc,0,2*sc);
-    //        glVertex3f(-3*sc,-2*sc,0);
-    //
-    //        /* wings
-    //         vertex(2*sc,0,0);
-    //         vertex(-1*sc,0,0);
-    //         vertex(-1*sc,-8*sc,flap);
-    //         
-    //         vertex(2*sc,0,0);
-    //         vertex(-1*sc,0,0);
-    //         vertex(-1*sc,8*sc,flap);
-    //         */
-    //        
-    //        glVertex3f(-3*sc,0,2*sc);
-    //        glVertex3f(-3*sc,2*sc,0);
-    //        glVertex3f(-3*sc,-2*sc,0);
-    //        glEnd();
             ofPopMatrix();
         }
     }
@@ -224,7 +291,7 @@ public:
             steer -= pos;
             // steer.set(PVector.sub(target,pos));
             // steering vector points towards target (switch target and pos for avoiding)
-            steer.limit(maxForce); //limits the steering force to maxSteerForce
+            steer.limit(boidForce); //limits the steering force to maxSteerForce
         } else {
 //            PVector targetOffset = PVector.sub(target,pos);
 //            float distance=targetOffset.mag();
@@ -249,7 +316,7 @@ public:
         return steer;
     }
     
-    ofVec3f seperation(vector <Boid> boids) {
+    ofVec3f separation(vector <Boid> boids) {
         ofVec3f posSum;
         ofVec3f repulse;
         for(int i=0;i<boids.size();i++) {
@@ -258,7 +325,7 @@ public:
                 dist.set(pos);
                 dist -= other;
                 float d = dist.length();
-                if(d > 0 && d <= personalSpace) {
+                if(type == boids[i].type && d > 0 && d <= personalSpace) {
                     repulse.set(dist);
                     repulse.normalize();
                     repulse /= d;
@@ -278,7 +345,12 @@ public:
                 dist.set(pos);
                 dist -= other;
                 float d = dist.length();
-                if(d > 0 && d <= perception) {
+                
+                if (type == 0 && d > 0 && d <= boidPerception) {
+                    velSum += boids[i].vel;
+                    count++;
+                }
+                if (type == 1 && d > 0 && d <= predPerception) {
                     velSum += boids[i].vel;
                     count++;
                 }
@@ -286,7 +358,7 @@ public:
         }
         if(count > 0) {
             velSum /= (float)count;
-            velSum.limit(maxForce);
+            velSum.limit(boidForce);
         }
         return velSum;
     }
@@ -303,7 +375,12 @@ public:
                 dist.set(pos);
                 dist -= other;
                 float d = dist.length();
-                if(d > 0 && d <= perception) {
+                
+                if(type == 0 && d > 0 && d <= boidPerception) {
+                    posSum += boids[i].pos;
+                    count++;
+                }
+                if(type == 1 && d > 0 && d <= predPerception) {
                     posSum += boids[i].pos;
                     count++;
                 }
@@ -314,7 +391,13 @@ public:
         }
         steer.set(pos);
         steer -= posSum;
-        steer.limit(maxForce);
+        if (type == 0){
+            steer.limit(boidForce);
+        }
+        if (type == 1) {
+            steer.limit(predForce);
+        }
+    
         return steer;
     }
 
@@ -330,13 +413,7 @@ public:
             isDead = true;
         }
     }
-    
-    void ageBoids() {
-        if (age > 100) {
-            isDead = true;
-        }
-    }
-    
+        
     
     
     

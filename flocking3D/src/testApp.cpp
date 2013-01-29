@@ -4,33 +4,30 @@
 
 void testApp::setup(){
     ofSetFrameRate(60);
-    tick = 0.01;
+    tick = 0.0001;
     ofBackground(0);
     
     
     personalSpace = 1;
     guiDraw = false;
-    worldSize = 400;
+    worldSize = 800;
     
     cam.resetTransform();
     cam.setFov(60);
     cam.clearParent();
-    cam.setPosition(ofGetWidth()/2, ofGetHeight()/2, worldSize*2);
+//    cam.setPosition(ofGetWidth()/2, ofGetHeight()/2, worldSize*2);
     cam.roll(90);
     camDraw = true;
-
-    
-
-
+    flock.reset = false;
     setupGUI();
-    
+    camPos.set(ofGetWidth()/2, ofGetHeight()/2, worldSize*2);
     
     centre.set(ofGetWidth()/2,ofGetHeight()/2,0);
     bodies.push_back(ofxBody( ofVec3f(centre), 90, ATTRACT));
     outer.setDims(centre,worldSize);
     
-//    predators.push_back(Predator(0, outer, centre));
-    flock.addBoids(200, outer, centre);
+    flock.addBoids(300, outer, centre,0);
+    flock.addBoids(1, outer, centre, 1);
     
     gui.loadFromXML();
 	
@@ -41,40 +38,30 @@ void testApp::setup(){
 
 void testApp::update(){
     glEnable(GL_DEPTH_TEST);
-    time ++;
-    if (time > tick) {
+    time = time + tick;
+    if (time > 1) {
         updateGUI();
-        for (int i=0;i<predators.size();i++) {
-//            predators[i].run(flock.boids, outer);
-        }
         flock.update(outer, bodies);
-        if (reset == true) {
-            reset = false;
-        }
         time = 0;
-        
     }
+    cam.setPosition(camPos.x, camPos.y, camPos.z);
 }
 
 
 void testApp::draw(){
-    // activate camera
-    if (camDraw) {
-        cam.begin();
-        cam.draw();
+    if (camDraw) cam.begin(); cam.draw();
+
+    if (drawBodies) {
+        for (int i=0;i<bodies.size();i++) {
+            bodies[i].draw();
+        }
     }
+
+    if (drawBounds) outer.draw();
     
-    for (int i=0;i<bodies.size();i++) {
-        bodies[i].draw();
-    }
-    outer.draw();
     flock.draw();
-    for (int i=0;i<predators.size();i++) {
-//        predators[i].render();
-    }
-    if (camDraw) {
-        cam.end();
-    }
+    
+    if (camDraw) cam.end();
     if (guiDraw) gui.draw();
 
 }
@@ -82,17 +69,19 @@ void testApp::draw(){
 void testApp::updateGUI() {
     outer.length = worldSize;
     
-    flock.avoidWalls = avoidWalls;
-    flock.separationF = separationF;
-    flock.cohesionF = cohesionF;
-    flock.alignF = alignF;
-    flock.perception = perception;
-    flock.personalSpace = personalSpace;
-    flock.maxForce = maxForce;
-    flock.maxSpeed = maxSpeed;
-    flock.reset = reset;
-    flock.interactWithBodies = interactWithBodies;
-
+//    flock.avoidWalls = avoidWalls;
+//    flock.separationF = separationF;
+//    flock.cohesionF = cohesionF;
+//    flock.alignF = alignF;
+//    flock.boidPerception = boidPerception;
+//    flock.predPerception = predPerception;
+//    flock.personalSpace = personalSpace;
+//    flock.maxForce = maxForce;
+//    flock.maxSpeed = maxSpeed;
+//    flock.reset = reset;
+//    flock.interactWithBodies = interactWithBodies;
+//    flock.drawFlock = drawFlock;
+//    flock.drawPreds = drawPreds;
     outer.updateGUI();
     flock.updateGUI();
 
@@ -101,28 +90,40 @@ void testApp::updateGUI() {
 
 void testApp::setupGUI() {
     gui.addTitle("Boids");
-	gui.addToggle("Avoid Walls", avoidWalls);
-	gui.addSlider("Separation", separationF, 0, 15);
-	gui.addSlider("Cohesion", cohesionF, 0, 5);
-	gui.addSlider("Alignment", alignF, 0, 5);
-    gui.addSlider("Perception", perception, 1, 500);
-    gui.addSlider("PersonalSpace", personalSpace, 1, 100);
-    gui.addSlider("Turning Force", maxForce, 0.1, 5);
-    gui.addSlider("Speed", maxSpeed, 0.1, 5);
-    gui.addSlider("Drag", dragF, 0.1, 1);
-    gui.addToggle("Reset Boids", reset);
+	gui.addToggle("Avoid Walls", flock.avoidWalls);
+	gui.addSlider("Separation", flock.separationF, 0, 15);
+	gui.addSlider("Cohesion", flock.cohesionF, 0, 5);
+	gui.addSlider("Alignment", flock.alignF, 0, 5);
+    gui.addSlider("Boid Perception", flock.boidPerception, 1, 500);
+    gui.addSlider("PersonalSpace", flock.personalSpace, 1, 100);
+    gui.addSlider("Boid Force", flock.boidForce, 0.1, 10);
+    gui.addSlider("Boid Speed", flock.boidSpeed, 0.1, 10);
+    gui.addSlider("Drag", flock.dragF, 0.1, 1);
+    gui.addSlider("Evade Force", flock.evadeForce, 0.1, 15);
+    gui.addToggle("Interact with Bodies", flock.interactWithBodies);
+    gui.addToggle("Interact with Predators", flock.interactWithPredators);
+    
+    gui.addTitle("Predators").setNewColumn(true);
+    gui.addSlider("Predator Speed",flock.predSpeed,0.1,10);
+    gui.addSlider("Predator Force",flock.predForce,0.1,10);
+    gui.addSlider("Predator Perception", flock.predPerception, 1, 500);
     
     gui.addTitle("World").setNewColumn(true);
-    gui.addSlider("Size",worldSize,100,1000);
+    gui.addSlider("TimeSpeed",tick,0,1);
+    gui.addSlider("Size",worldSize,100,2000);
+    gui.addToggle("Draw Bounds", drawBounds);
+    gui.addToggle("Draw Bodies", drawBodies);    
+    gui.addToggle("Draw Flock", flock.drawFlock);
+    gui.addToggle("Draw Predators", flock.drawPreds);
+    gui.addToggle("Reset Boids", flock.reset);
     
-    gui.addTitle("Interaction");
-    gui.addToggle("Interact with Bodies", interactWithBodies);
-    
-    //	gui.addSlider("myInt1", myInt1, 100, 200);
-    //	gui.addComboBox("box1", box1, 12, NULL);
-    //	gui.addButton("Randomize Background", randomizeButton);
-    //	gui.addColorPicker("BG Color", aColor);
-    
+    gui.addTitle("Camera").setNewColumn(true);
+    gui.addSlider("Camera Position X", camPos.x, -2000, 2000);
+    gui.addSlider("Camera Position Y", camPos.y, -2000, 2000);
+    gui.addSlider("Camera Position Z", camPos.z, -2000, 2000);
+
+
+
 
 }
 
