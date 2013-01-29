@@ -1,0 +1,1 @@
+Not the best working copy of Boids.  See flocking3D for the best version.
