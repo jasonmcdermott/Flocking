@@ -20,11 +20,27 @@ class testApp : public ofBaseApp{
 		void windowResized(int w, int h);
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
+    void updateGUI();
     
     int initBoidNum;
     ofVec3f centre;
     Flock flock;
     Boundary outer;
-    bool smoothEdges, avoidWalls;
+    bool smoothEdges;
     float time, tick;
+    
+    bool guiDraw;
+    bool	avoidWalls;
+//    bool	myBool2;
+//    bool	myBool3;
+//    bool	myBool4;
+//    bool	myBool5;
+//    bool	myBool6;
+//    bool	myBool7;
+//    bool	myBool8;
+//    bool	myBool9;
+    
+    float separationF, cohesionF, alignF, dragF, personalSpace, perception, maxForce, maxSpeed;
+    bool reset;
+    
 };

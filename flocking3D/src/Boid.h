@@ -10,7 +10,7 @@ public:
     ofVec3f other, dist;
     float c;
     float maxSpeed = 3;
-    float maxSteerForce = .5;
+    float maxForce = .5;
     float h;
     float sc = 3;
     float flap = 0;
@@ -18,6 +18,9 @@ public:
     int ID;
     string a;
     ofVec3f outerTemp;
+    float separationF, alignF, cohesionF, dragF;
+    bool reset, isDead;
+    int age;
     
     Boid() {
         
@@ -25,20 +28,38 @@ public:
     
     Boid(int ID_, Boundary outer, ofVec3f centre_) {
         origin.set(centre_);
-        pos.set(origin.x + ofRandom(-outer.halfLength,outer.halfLength),origin.y + ofRandom(-outer.halfLength,outer.halfLength),origin.z+ ofRandom(-outer.halfLength,outer.halfLength));
+        origin.set(origin.x + ofRandom(-outer.halfLength,outer.halfLength),origin.y + ofRandom(-outer.halfLength,outer.halfLength),origin.z+ ofRandom(-outer.halfLength,outer.halfLength));
+        ID = ID_;
+        isDead = false;
+        age = 0;
+        initBoid();
+    }
+
+    void initBoid() {
+        pos.set(origin);
         vel.set(0,0,0);
         acc.set(0,0,0);
         personalSpace = 15;
         perception = 50;
-        ID = ID_;
         c = 255;
+        alignF = 1;
+        separationF = 1;
+        cohesionF = 1;
+        dragF = 0.95;
     }
-
     
     void run(vector <Boid> boids, Boundary outer) {
         a = "";
-        
-        avoidBounds(outer);
+        age ++;
+        if (reset == true) {
+            initBoid();
+        }
+        if (avoidWalls) {
+            avoidBounds(outer);
+            resetStrays();
+        } else {
+            checkBounds(outer);
+        }
         
 //        ofVec3f avo;
 //        avo = avoidBounds(outer);
@@ -46,7 +67,7 @@ public:
 //        acc += avo;
 //        a += " av is: " + ofToString(pos.x,2) + " , " + ofToString(pos.y,2) + " , " + ofToString(pos.z,2) +  " \n";
 //        a += " av is: " + ofToString(avLeft.x,2) + " , " + ofToString(avLeft.y,2) + " , " + ofToString(avLeft.z,2) +  " \n";
-//        checkBounds(outer);
+
 
         flock(boids);
         move();
@@ -58,9 +79,9 @@ public:
         coh = cohesion(boids);
         sep = seperation(boids);
         
-        ali *= 1;
-        coh *= 1.5;
-        sep *= 1;
+        ali *= alignF;
+        coh *= cohesionF;
+        sep *= separationF;
         
         acc += ali;
         acc += coh;
@@ -71,6 +92,7 @@ public:
     void move() {
         vel += acc; //add acceleration to velocity
         vel.limit(maxSpeed); //make sure the velocity vector magnitude does not exceed maxSpeed
+        vel *= dragF; // add a drag force into the mix.
         pos += vel; //add velocity to position
         acc *= 0; //reset acceleration
     }
@@ -160,7 +182,7 @@ public:
             steer -= pos;
             // steer.set(PVector.sub(target,pos));
             // steering vector points towards target (switch target and pos for avoiding)
-            steer.limit(maxSteerForce); //limits the steering force to maxSteerForce
+            steer.limit(maxForce); //limits the steering force to maxSteerForce
         } else {
 //            PVector targetOffset = PVector.sub(target,pos);
 //            float distance=targetOffset.mag();
@@ -223,7 +245,7 @@ public:
         }
         if(count > 0) {
             velSum /= (float)count;
-            velSum.limit(maxSteerForce);
+            velSum.limit(maxForce);
         }
         return velSum;
     }
@@ -249,9 +271,22 @@ public:
         }
         steer.set(pos);
         steer -= posSum;
-        steer.limit(maxSteerForce); 
+        steer.limit(maxForce);
         return steer;
     }
 
+    
+    void updateGUI(bool avoidWalls_, float separationF_, float cohesionF_, float alignF_) {
+        avoidWalls = avoidWalls_;
+        separationF = separationF_;
+        cohesionF = cohesionF_;
+        alignF = alignF_;
+    }
+    
+    void resetStrays() {
+        
+    }
 
 };
+
+
