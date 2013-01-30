@@ -29,7 +29,7 @@ void testApp::setup(){
     bodies.push_back(ofxBody( ofVec3f(centre), 90, ATTRACT));
     outer.setDims(centre,worldSize);
     
-    flock.addBoids(200, outer, centre,0);
+    flock.addBoids(100, outer, centre,0);
     flock.addBoids(1, outer, centre, 1);
     
     gui.loadFromXML();
@@ -41,6 +41,7 @@ void testApp::setup(){
 
 void testApp::update(){
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
     ofEnableAlphaBlending();
     time = time + tick;
     if (time > 1) {
@@ -63,8 +64,12 @@ void testApp::draw(){
     }
 
     if (drawBounds) outer.draw();
-    
+
+
+//    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+    glEnableClientState      (GL_VERTEX_ARRAY);
     flock.draw();
+    glDisableClientState   (GL_VERTEX_ARRAY);
     
     if (camDraw) cam.end();
     if (guiDraw) gui.draw();
@@ -107,7 +112,7 @@ void testApp::setupGUI() {
     gui.addSlider("Boid Speed", flock.boidSpeed, 0.1, 10);
     gui.addSlider("Drag", flock.dragF, 0.1, 1);
     gui.addColorPicker("Boid Color", flock.boidColor);
-    gui.addSlider("Evade Force", flock.evadeForce, 0.1, 15);
+    gui.addSlider("Evade Force", flock.evadeForce, 0.1, 35);
     gui.addToggle("Interact with Bodies", flock.interactWithBodies);
     gui.addToggle("Interact with Predators", flock.interactWithPredators);
     gui.addToggle("Avoid Walls", flock.avoidWalls);
@@ -139,7 +144,7 @@ void testApp::keyPressed(int key){
 }
 
 void testApp::snapFrame() {
-    if (ofGetFrameNum() % 300 == 0){
+    if (ofGetFrameNum() % 900 == 0){
 		img.grabScreen(0,0,ofGetWidth(),ofGetHeight());
 		string fileName = "../../../../images/flocking3D_"+ofGetTimestampString()+".png";
 		img.saveImage(fileName);

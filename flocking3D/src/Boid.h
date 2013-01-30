@@ -27,7 +27,7 @@ public:
     float separationF, alignF, cohesionF, dragF, mass;
     bool isDead, interactWithBodies, interactWithPredators;
     bool reset = false, updatePrey, renderVA = true;
-    int age, type, prey;
+    int age, type, prey, trailCount = 0;
     ofFloatColor	boidColor;
     
     
@@ -37,11 +37,12 @@ public:
     float radius;
     
     // BAKER SPHERICAL COMPONENTS
-    float degreeIncrement         = 10;      // 10 degrees between
+
+    float degreeIncrement         = 20;      // 10 degrees between
     int   sphereVertexCount      = (180 / degreeIncrement) * (360 / degreeIncrement) * 4;
     
     float M_PI_Divided_By_180;
-    GLfloat sphereVertex3f   [2592][3];
+
 //    GLfloat sphereTexCoord2f [2592][2];
     
     //     http://forums.inside3d.com/viewtopic.php?f=10&t=4835
@@ -78,7 +79,9 @@ public:
         dragF = 0.95;
         a = "";
         M_PI_Divided_By_180 = M_PI/180;
-        
+
+
+
         if (type == 0) {
             alignF = 1;
             interactWithBodies = true;
@@ -91,17 +94,7 @@ public:
             predPerception = 500;
             sc = 10;
         }
-        createSphere ();
-//        // build sphere geometry
-//        getSolidSphere(&sphereTriangleStripVertices,
-//                       &sphereTriangleStripNormals,
-//                       &sphereTriangleStripVertexCount,
-//                       &sphereTriangleFanVertices,
-//                       &sphereTriangleFanNormals,
-//                       &sphereTriangleFanVertexCount,
-//                       sc,
-//                       100,
-//                       100);
+        createSphere();
     }
     
     void run(vector <Boid> boids, Boundary outer, vector <ofxBody> bodies) {
@@ -117,10 +110,6 @@ public:
             }
             if (interactWithPredators) {
                 if (type == 1) {
-    //                if (updatePrey == true) {
-                        choosePrey(boids);
-    //                    updatePrey = false;
-    //                }
                 }
             }
             if (avoidWalls) {
@@ -189,25 +178,42 @@ public:
             if (type == 1) {
                 trailPrey(boids);
             }
-            gobble(boids);
+//            gobble(boids);
         }
     }
     
     void choosePrey(vector <Boid> boids) {
-        float closest = 500;
-        for (int i=0;i<boids.size();i++) {
-            if (boids[i].isDead == false && boids[i].type == 0) {
-                ofVec3f distance;
-                distance = boids[i].pos - pos;
-                float dist = distance.length();
-                if (dist < closest) {
+        if (randomPrey == false) {
+            float closest = 500;
+            for (int i=0;i<boids.size();i++) {
+                if (boids[i].isDead == false && boids[i].type == 0) {
+                    ofVec3f distance;
+                    distance = boids[i].pos - pos;
+                    float dist = distance.length();
+                    if (dist < closest) {
+                        prey = i;
+                    }
+                }
+            }
+        } else {
+            for (int i=0;i<boids.size();i++) {
+                int rand = int(ofRandom(0,boids.size()));
+                if (boids[i].isDead == false && boids[i].type == 0) {
                     prey = i;
+                } else {
+                    choosePrey(boids);
                 }
             }
         }
     }
 
     void trailPrey(vector <Boid> boids) {
+        trailCount++;
+        if (trailCount > 200) {
+            updatePrey = true;
+            choosePrey(boids);
+            trailCount = 0;
+        }
         for (int i=0;i<boids.size();i++) {
             if (boids[prey].type == 0) {
                 ofVec3f att;
@@ -220,6 +226,12 @@ public:
                 if (dist > minDist) {
                     force *= inverseSquare;
                     acc += force;
+                }
+                if (dist < minDist) {
+                    boids[prey].isDead = true;
+                    updatePrey = true;
+                    choosePrey(boids);
+                    trailCount = 0;
                 }
             }
         }
@@ -271,6 +283,8 @@ public:
         acc *= 0; //reset acceleration
     }
     
+    void createSphere() {
+    }
     
     void render() {
         if (isDead != true) {
@@ -280,13 +294,13 @@ public:
                 ofSetColor(boidColor);
             } else if (type == 1) {
                 ofSetColor(200,0,0);
-                ofDrawBitmapString(ofToString(type,0),5,10);                
+//                ofDrawBitmapString(ofToString(trailCount,0),5,10);
             }
 //            ofSphere(0,0,0,sc);
 //            ofBox(0,0,0,sc);
 
             if (renderVA) {
-//                renderVALaMarche();
+                createSphere();
                 renderVASphere();
             }
             ofPopMatrix();
@@ -310,56 +324,47 @@ public:
 //        glDisableClientState(GL_NORMAL_ARRAY);
     }
     
-    void createSphere() {
-        int vertNum = 0;
-        
-        for (float z = 0; z <= 180 - degreeIncrement; z += degreeIncrement) // Iterate through height of sphere of Z
-            for (float c = 0; c <= 360 - degreeIncrement; c += degreeIncrement) // Each point of the circle X, Y of "C"
-            {
-                sphereVertex3f   [vertNum][0] = sinf( (c) * M_PI_Divided_By_180 ) * sinf( (z) * M_PI_Divided_By_180 );
-                sphereVertex3f   [vertNum][1] = cosf( (c) * M_PI_Divided_By_180 ) * sinf( (z) * M_PI_Divided_By_180 );
-                sphereVertex3f   [vertNum][2] = cosf( (z) * M_PI_Divided_By_180 );
-//                sphereTexCoord2f [vertNum][0] = (c)     / 360;
-//                sphereTexCoord2f [vertNum][1] = (2 * z) / 360;
-                vertNum ++; // ^ Top Left
-                
-                sphereVertex3f    [vertNum][0] = sinf( (c) * M_PI_Divided_By_180 ) * sinf( (z + degreeIncrement) * M_PI_Divided_By_180 );
-                sphereVertex3f    [vertNum][1] = cosf( (c) * M_PI_Divided_By_180 ) * sinf( (z + degreeIncrement) * M_PI_Divided_By_180 );
-                sphereVertex3f    [vertNum][2] = cosf( (z + degreeIncrement) * M_PI_Divided_By_180 );
-//                sphereTexCoord2f [vertNum][0] = (c)               / 360;
-//                sphereTexCoord2f [vertNum][1] = (2 * (z + degreeIncrement)) / 360;
-                vertNum ++; // ^ Top Right
-                
-                sphereVertex3f    [vertNum][0] = sinf( (c + degreeIncrement) * M_PI_Divided_By_180 ) * sinf( (z) * M_PI_Divided_By_180 );
-                sphereVertex3f    [vertNum][1] = cosf( (c + degreeIncrement) * M_PI_Divided_By_180 ) * sinf( (z) * M_PI_Divided_By_180 );
-                sphereVertex3f    [vertNum][2] = cosf( (z) * M_PI_Divided_By_180 );
-//                sphereTexCoord2f [vertNum][0] = (c + degreeIncrement) / 360;
-//                sphereTexCoord2f [vertNum][1] = (2 * z)     / 360;
-                vertNum ++; // ^ Bottom Left
-                
-                sphereVertex3f    [vertNum][0] = sinf( (c + degreeIncrement) * M_PI_Divided_By_180 ) * sinf( (z + degreeIncrement) * M_PI_Divided_By_180 );
-                sphereVertex3f    [vertNum][1] = cosf( (c + degreeIncrement) * M_PI_Divided_By_180 ) * sinf( (z + degreeIncrement) * M_PI_Divided_By_180 );
-                sphereVertex3f    [vertNum][2] = cosf( (z + degreeIncrement) * M_PI_Divided_By_180 );
-//                sphereTexCoord2f [vertNum][0] = (c + degreeIncrement)       / 360;
-//                sphereTexCoord2f [vertNum][1] = (2 * (z + degreeIncrement)) / 360;
-                vertNum ++; // ^ Bottom Right
-            }
-    }
     
     void renderVASphere() {
+        GLfloat sphereVertex3f [648][3];
+        int vertNum = 0;
+        
+        for (float z = 0; z <= 180 - degreeIncrement; z += degreeIncrement)  // Iterate through height of sphere of Z
+            for (float c = 0; c <= 360 - degreeIncrement; c += degreeIncrement) { // Each point of the circle X, Y of "C"
+                
+                sphereVertex3f   [vertNum][0] = sinf( (c) * M_PI_Divided_By_180 ) * sinf( (z) * M_PI_Divided_By_180 )*sc;
+                sphereVertex3f   [vertNum][1] = cosf( (c) * M_PI_Divided_By_180 ) * sinf( (z) * M_PI_Divided_By_180 )*sc;
+                sphereVertex3f   [vertNum][2] = cosf( (z) * M_PI_Divided_By_180 )*sc;
+                //                sphereTexCoord2f [vertNum][0] = (c)     / 360;
+                //                sphereTexCoord2f [vertNum][1] = (2 * z) / 360;
+                vertNum ++; // ^ Top Left
+                
+                sphereVertex3f    [vertNum][0] = sinf( (c) * M_PI_Divided_By_180 ) * sinf( (z + degreeIncrement) * M_PI_Divided_By_180 )*sc;
+                sphereVertex3f    [vertNum][1] = cosf( (c) * M_PI_Divided_By_180 ) * sinf( (z + degreeIncrement) * M_PI_Divided_By_180 )*sc;
+                sphereVertex3f    [vertNum][2] = cosf( (z + degreeIncrement) * M_PI_Divided_By_180 )*sc;
+                //                sphereTexCoord2f [vertNum][0] = (c)               / 360;
+                //                sphereTexCoord2f [vertNum][1] = (2 * (z + degreeIncrement)) / 360;
+                vertNum ++; // ^ Top Right
+                
+                sphereVertex3f    [vertNum][0] = sinf( (c + degreeIncrement) * M_PI_Divided_By_180 ) * sinf( (z) * M_PI_Divided_By_180 )*sc;
+                sphereVertex3f    [vertNum][1] = cosf( (c + degreeIncrement) * M_PI_Divided_By_180 ) * sinf( (z) * M_PI_Divided_By_180 )*sc;
+                sphereVertex3f    [vertNum][2] = cosf( (z) * M_PI_Divided_By_180 )*sc;
+                //                sphereTexCoord2f [vertNum][0] = (c + degreeIncrement) / 360;
+                //                sphereTexCoord2f [vertNum][1] = (2 * z)     / 360;
+                vertNum ++; // ^ Bottom Left
+                
+                sphereVertex3f    [vertNum][0] = sinf( (c + degreeIncrement) * M_PI_Divided_By_180 ) * sinf( (z + degreeIncrement) * M_PI_Divided_By_180 )*sc;
+                sphereVertex3f    [vertNum][1] = cosf( (c + degreeIncrement) * M_PI_Divided_By_180 ) * sinf( (z + degreeIncrement) * M_PI_Divided_By_180 )*sc;
+                sphereVertex3f    [vertNum][2] = cosf( (z + degreeIncrement) * M_PI_Divided_By_180 )*sc;
+                //                sphereTexCoord2f [vertNum][0] = (c + degreeIncrement)       / 360;
+                //                sphereTexCoord2f [vertNum][1] = (2 * (z + degreeIncrement)) / 360;
+                vertNum ++; // ^ Bottom Right
+                
+            }
+        
 
-//        glEnable              (GL_TEXTURE_2D);
-//        glBindTexture         (GL_TEXTURE_2D, TexSlot);
-        
-        // size (Specifies  the  number  of  coordinates per array element), type (GL_FLOAT, etc), stride, pointer
-//        glTexCoordPointer      (2, GL_FLOAT, 0, sphereTexCoord2f);
-//        glEnableClientState      (GL_TEXTURE_COORD_ARRAY);
-        
         glVertexPointer         (3, GL_FLOAT, 0, sphereVertex3f);
-        glEnableClientState      (GL_VERTEX_ARRAY);
         glDrawArrays         (GL_TRIANGLE_STRIP, 0, sphereVertexCount);
-        glDisableClientState   (GL_VERTEX_ARRAY);
-        glDisableClientState   (GL_TEXTURE_COORD_ARRAY);
     }
     
     void checkBounds(Boundary outer) {

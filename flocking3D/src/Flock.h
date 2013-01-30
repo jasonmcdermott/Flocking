@@ -14,6 +14,7 @@ public:
     bool avoidWalls, interactWithBodies, drawBodies, drawFlock, drawPreds, interactWithPredators;
     float separationF, cohesionF, alignF, dragF, personalSpace, boidPerception, predPerception, predSpeed, predForce, boidForce, boidSpeed, evadeForce;
     ofFloatColor	boidColor;
+    bool renderVA = true;
     
     Flock() {
         
@@ -26,9 +27,48 @@ public:
         if (reset == true) {
             reset = false;
         }
+
+        if (interactWithPredators) {
+//            for (int i=0;i<boids.size();i++) {
+//                if (boids[i].type == 1) {
+//                    ofVec3f mid;
+//                    ofVec3f steer;
+//                    mid.set(findBoidsMidst());
+//                    steer.set(boids[i].pos);
+//                    steer -= mid;
+//                    steer.limit(predForce);
+//                    boids[i].acc += -steer;
+//                }
+//            }
+        }
+    }
+    
+    int countLiveBoids() {
+        int liveBoidCount = 0;
+        for (int i=0;i<boids.size();i++) {
+            if (boids[i].isDead == false) {
+                liveBoidCount ++;
+            }
+        }
+        return liveBoidCount;
+    }
+    
+    ofVec3f findBoidsMidst() {
+        ofVec3f steer;
+        steer.set(0,0,0);
+        int count = 0;
+        for(int i=0;i<boids.size();i++) {
+            if (boids[i].type == 0 && boids[i].isDead != true) {
+                steer += boids[i].pos;
+            }
+        }
+        int c = countLiveBoids();
+        steer /= c;
+        return steer;
     }
     
     void draw() {
+
         for(int i=0;i<boids.size();i++) {
             if (drawFlock == true && boids[i].type == 0) {
                 boids[i].render();
@@ -37,6 +77,7 @@ public:
                 boids[i].render();
             }
         }
+
     }
     
     void addBoids(int n, Boundary outer, ofVec3f centre, int type_) {
@@ -64,6 +105,7 @@ public:
             boids[i].interactWithBodies = interactWithBodies;
             boids[i].interactWithPredators = interactWithPredators;
             boids[i].boidColor = boidColor;
+            boids[i].renderVA = renderVA;
         }
     }
     
