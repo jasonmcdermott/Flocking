@@ -26,9 +26,30 @@ public:
     ofVec3f outerTemp;
     float separationF, alignF, cohesionF, dragF, mass;
     bool isDead, interactWithBodies, interactWithPredators;
-    bool reset = false, updatePrey;
+    bool reset = false, updatePrey, renderVA = true;
     int age, type, prey;
     ofFloatColor	boidColor;
+    
+    
+    // LAMARCHE SPHERICAL COMPONENTS
+    ofVec3f triangleStripVertexHandle, triangleStripNormalHandle,triangleFanVertexHandle, triangleFanNormalHandle;
+    GLint triangleStripVertexCount,triangleFanVertexCount,slices,stacks;
+    float radius;
+    
+    // BAKER SPHERICAL COMPONENTS
+    float degreeIncrement         = 10;      // 10 degrees between
+    int   sphereVertexCount      = (180 / degreeIncrement) * (360 / degreeIncrement) * 4;
+    
+    float M_PI_Divided_By_180;
+    GLfloat sphereVertex3f   [2592][3];
+//    GLfloat sphereTexCoord2f [2592][2];
+    
+    //     http://forums.inside3d.com/viewtopic.php?f=10&t=4835
+    // Based on http://www.swiftless.com/tutorials/opengl/sphere.html
+    // Overhauled and streamlined.
+    
+    
+    
     
     Boid() {
         
@@ -56,7 +77,8 @@ public:
         cohesionF = 1;
         dragF = 0.95;
         a = "";
-
+        M_PI_Divided_By_180 = M_PI/180;
+        
         if (type == 0) {
             alignF = 1;
             interactWithBodies = true;
@@ -69,6 +91,17 @@ public:
             predPerception = 500;
             sc = 10;
         }
+        createSphere ();
+//        // build sphere geometry
+//        getSolidSphere(&sphereTriangleStripVertices,
+//                       &sphereTriangleStripNormals,
+//                       &sphereTriangleStripVertexCount,
+//                       &sphereTriangleFanVertices,
+//                       &sphereTriangleFanNormals,
+//                       &sphereTriangleFanVertexCount,
+//                       sc,
+//                       100,
+//                       100);
     }
     
     void run(vector <Boid> boids, Boundary outer, vector <ofxBody> bodies) {
@@ -249,11 +282,84 @@ public:
                 ofSetColor(200,0,0);
                 ofDrawBitmapString(ofToString(type,0),5,10);                
             }
-            ofSphere(0,0,0,sc);
+//            ofSphere(0,0,0,sc);
 //            ofBox(0,0,0,sc);
 
+            if (renderVA) {
+//                renderVALaMarche();
+                renderVASphere();
+            }
             ofPopMatrix();
         }
+    }
+    
+    void renderVALaMarche() {
+//        // enable vertex and normal data
+//        glEnableClientState(GL_VERTEX_ARRAY);
+//        glEnableClientState(GL_NORMAL_ARRAY);
+//        // draw fan parts of sphere
+//        glVertexPointer(3, GL_FLOAT, 0, sphereTriangleFanVertices);
+//        glNormalPointer(GL_FLOAT, 0, sphereTriangleFanNormals);
+//        glDrawArrays(GL_TRIANGLE_FAN, 0, sphereTriangleFanVertexCount);
+//        // draw strip parts of sphere
+//        glVertexPointer(3, GL_FLOAT, 0, sphereTriangleStripVertices);
+//        glNormalPointer(GL_FLOAT, 0, sphereTriangleStripNormals);
+//        glDrawArrays(GL_TRIANGLE_STRIP, 0, sphereTriangleStripVertexCount);
+//        // disable vertex and normal data
+//        glDisableClientState(GL_VERTEX_ARRAY);
+//        glDisableClientState(GL_NORMAL_ARRAY);
+    }
+    
+    void createSphere() {
+        int vertNum = 0;
+        
+        for (float z = 0; z <= 180 - degreeIncrement; z += degreeIncrement) // Iterate through height of sphere of Z
+            for (float c = 0; c <= 360 - degreeIncrement; c += degreeIncrement) // Each point of the circle X, Y of "C"
+            {
+                sphereVertex3f   [vertNum][0] = sinf( (c) * M_PI_Divided_By_180 ) * sinf( (z) * M_PI_Divided_By_180 );
+                sphereVertex3f   [vertNum][1] = cosf( (c) * M_PI_Divided_By_180 ) * sinf( (z) * M_PI_Divided_By_180 );
+                sphereVertex3f   [vertNum][2] = cosf( (z) * M_PI_Divided_By_180 );
+//                sphereTexCoord2f [vertNum][0] = (c)     / 360;
+//                sphereTexCoord2f [vertNum][1] = (2 * z) / 360;
+                vertNum ++; // ^ Top Left
+                
+                sphereVertex3f    [vertNum][0] = sinf( (c) * M_PI_Divided_By_180 ) * sinf( (z + degreeIncrement) * M_PI_Divided_By_180 );
+                sphereVertex3f    [vertNum][1] = cosf( (c) * M_PI_Divided_By_180 ) * sinf( (z + degreeIncrement) * M_PI_Divided_By_180 );
+                sphereVertex3f    [vertNum][2] = cosf( (z + degreeIncrement) * M_PI_Divided_By_180 );
+//                sphereTexCoord2f [vertNum][0] = (c)               / 360;
+//                sphereTexCoord2f [vertNum][1] = (2 * (z + degreeIncrement)) / 360;
+                vertNum ++; // ^ Top Right
+                
+                sphereVertex3f    [vertNum][0] = sinf( (c + degreeIncrement) * M_PI_Divided_By_180 ) * sinf( (z) * M_PI_Divided_By_180 );
+                sphereVertex3f    [vertNum][1] = cosf( (c + degreeIncrement) * M_PI_Divided_By_180 ) * sinf( (z) * M_PI_Divided_By_180 );
+                sphereVertex3f    [vertNum][2] = cosf( (z) * M_PI_Divided_By_180 );
+//                sphereTexCoord2f [vertNum][0] = (c + degreeIncrement) / 360;
+//                sphereTexCoord2f [vertNum][1] = (2 * z)     / 360;
+                vertNum ++; // ^ Bottom Left
+                
+                sphereVertex3f    [vertNum][0] = sinf( (c + degreeIncrement) * M_PI_Divided_By_180 ) * sinf( (z + degreeIncrement) * M_PI_Divided_By_180 );
+                sphereVertex3f    [vertNum][1] = cosf( (c + degreeIncrement) * M_PI_Divided_By_180 ) * sinf( (z + degreeIncrement) * M_PI_Divided_By_180 );
+                sphereVertex3f    [vertNum][2] = cosf( (z + degreeIncrement) * M_PI_Divided_By_180 );
+//                sphereTexCoord2f [vertNum][0] = (c + degreeIncrement)       / 360;
+//                sphereTexCoord2f [vertNum][1] = (2 * (z + degreeIncrement)) / 360;
+                vertNum ++; // ^ Bottom Right
+            }
+    }
+    
+    void renderVASphere() {
+
+//        glEnable              (GL_TEXTURE_2D);
+//        glBindTexture         (GL_TEXTURE_2D, TexSlot);
+        
+        // size (Specifies  the  number  of  coordinates per array element), type (GL_FLOAT, etc), stride, pointer
+//        glTexCoordPointer      (2, GL_FLOAT, 0, sphereTexCoord2f);
+//        glEnableClientState      (GL_TEXTURE_COORD_ARRAY);
+        
+        glVertexPointer         (3, GL_FLOAT, 0, sphereVertex3f);
+        glEnableClientState      (GL_VERTEX_ARRAY);
+        glDrawArrays         (GL_TRIANGLE_STRIP, 0, sphereVertexCount);
+        glDisableClientState   (GL_VERTEX_ARRAY);
+        glDisableClientState   (GL_TEXTURE_COORD_ARRAY);
     }
     
     void checkBounds(Boundary outer) {
@@ -417,9 +523,18 @@ public:
             isDead = true;
         }
     }
-        
-    
-    
+
+//    void getSolidSphere(ofVec3f **triangleStripVertexHandle,
+//                        ofVec3f **triangleStripNormalHandle,
+//                        GLint *triangleStripVertexCount,
+//                        ofVec3f **triangleFanVertexHandle,
+//                        ofVec3f **triangleFanNormalHandle,
+//                        GLint *triangleFanVertexCount,
+//                        glFloat radius,
+//                        GLint slices,
+//                        GLint stacks) {
+//        
+//    }
     
 };
 
