@@ -5,7 +5,7 @@
     </Toggle_Avoid_Walls>
     <SliderFloat_Separation>
         <name>Separation</name>
-        <value>5.400000095</value>
+        <value>7.500000000</value>
     </SliderFloat_Separation>
     <SliderFloat_Cohesion>
         <name>Cohesion</name>
@@ -17,27 +17,34 @@
     </SliderFloat_Alignment>
     <SliderFloat_Boid_Perception>
         <name>Boid Perception</name>
-        <value>30.939998627</value>
+        <value>70.860000610</value>
     </SliderFloat_Boid_Perception>
     <SliderFloat_PersonalSpace>
         <name>PersonalSpace</name>
-        <value>14.859999657</value>
+        <value>14.365000725</value>
     </SliderFloat_PersonalSpace>
     <SliderFloat_Boid_Force>
         <name>Boid Force</name>
-        <value>0.743499994</value>
+        <value>1.139499903</value>
     </SliderFloat_Boid_Force>
     <SliderFloat_Boid_Speed>
         <name>Boid Speed</name>
-        <value>5.148999691</value>
+        <value>6.188499928</value>
     </SliderFloat_Boid_Speed>
     <SliderFloat_Drag>
         <name>Drag</name>
         <value>0.923500001</value>
     </SliderFloat_Drag>
+    <ColorPicker_Boid_Color>
+        <name>Boid Color</name>
+        <values_0>1.000000000</values_0>
+        <values_1>0.189999998</values_1>
+        <values_2>0.574999988</values_2>
+        <values_3>0.460000008</values_3>
+    </ColorPicker_Boid_Color>
     <SliderFloat_Evade_Force>
         <name>Evade Force</name>
-        <value>14.105999947</value>
+        <value>2.558500051</value>
     </SliderFloat_Evade_Force>
     <Toggle_Interact_with_Bodies>
         <name>Interact with Bodies</name>
@@ -89,14 +96,14 @@
     </Toggle_Reset_Boids>
     <SliderFloat_Camera_Position_X>
         <name>Camera Position X</name>
-        <value>500.000000000</value>
+        <value>740.000000000</value>
     </SliderFloat_Camera_Position_X>
     <SliderFloat_Camera_Position_Y>
         <name>Camera Position Y</name>
-        <value>380.000000000</value>
+        <value>560.000000000</value>
     </SliderFloat_Camera_Position_Y>
     <SliderFloat_Camera_Position_Z>
         <name>Camera Position Z</name>
-        <value>240.000000000</value>
+        <value>-140.000000000</value>
     </SliderFloat_Camera_Position_Z>
 </controls>

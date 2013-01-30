@@ -11,22 +11,23 @@ void testApp::setup(){
     personalSpace = 1;
     guiDraw = false;
     worldSize = 800;
-    
+    centre.set(ofGetWidth()/2,ofGetHeight()/2,0);
     cam.resetTransform();
     cam.setFov(60);
     cam.clearParent();
+    cam.lookAt(centre);
 //    cam.setPosition(ofGetWidth()/2, ofGetHeight()/2, worldSize*2);
-    cam.roll(90);
+//    cam.roll(90);
     camDraw = true;
     flock.reset = false;
     setupGUI();
     camPos.set(ofGetWidth()/2, ofGetHeight()/2, worldSize*2);
     
-    centre.set(ofGetWidth()/2,ofGetHeight()/2,0);
+
     bodies.push_back(ofxBody( ofVec3f(centre), 90, ATTRACT));
     outer.setDims(centre,worldSize);
     
-    flock.addBoids(300, outer, centre,0);
+    flock.addBoids(200, outer, centre,0);
     flock.addBoids(1, outer, centre, 1);
     
     gui.loadFromXML();
@@ -38,6 +39,7 @@ void testApp::setup(){
 
 void testApp::update(){
     glEnable(GL_DEPTH_TEST);
+    ofEnableAlphaBlending();
     time = time + tick;
     if (time > 1) {
         updateGUI();
@@ -45,6 +47,7 @@ void testApp::update(){
         time = 0;
     }
     cam.setPosition(camPos.x, camPos.y, camPos.z);
+    cam.lookAt(centre);
 }
 
 
@@ -63,7 +66,8 @@ void testApp::draw(){
     
     if (camDraw) cam.end();
     if (guiDraw) gui.draw();
-
+    ofSetColor(255,200);
+    ofDrawBitmapString("Hit 'g' to toggle GUI", 20,ofGetHeight()-20);
 }
 
 void testApp::updateGUI() {
@@ -90,7 +94,7 @@ void testApp::updateGUI() {
 
 void testApp::setupGUI() {
     gui.addTitle("Boids");
-	gui.addToggle("Avoid Walls", flock.avoidWalls);
+
 	gui.addSlider("Separation", flock.separationF, 0, 15);
 	gui.addSlider("Cohesion", flock.cohesionF, 0, 5);
 	gui.addSlider("Alignment", flock.alignF, 0, 5);
@@ -99,9 +103,11 @@ void testApp::setupGUI() {
     gui.addSlider("Boid Force", flock.boidForce, 0.1, 10);
     gui.addSlider("Boid Speed", flock.boidSpeed, 0.1, 10);
     gui.addSlider("Drag", flock.dragF, 0.1, 1);
+    gui.addColorPicker("Boid Color", flock.boidColor);
     gui.addSlider("Evade Force", flock.evadeForce, 0.1, 15);
     gui.addToggle("Interact with Bodies", flock.interactWithBodies);
     gui.addToggle("Interact with Predators", flock.interactWithPredators);
+    gui.addToggle("Avoid Walls", flock.avoidWalls);
     
     gui.addTitle("Predators").setNewColumn(true);
     gui.addSlider("Predator Speed",flock.predSpeed,0.1,10);
@@ -121,6 +127,7 @@ void testApp::setupGUI() {
     gui.addSlider("Camera Position X", camPos.x, -2000, 2000);
     gui.addSlider("Camera Position Y", camPos.y, -2000, 2000);
     gui.addSlider("Camera Position Z", camPos.z, -2000, 2000);
+
 
 
 

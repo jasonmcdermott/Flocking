@@ -37,7 +37,7 @@ class testApp : public ofBaseApp{
     
     bool guiDraw, drawBounds;
     
-    
+
     ofCamera cam;
     ofVec3f camPos;
     vector <ofxBody> bodies;

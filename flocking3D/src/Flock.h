@@ -13,6 +13,7 @@ public:
     bool reset = false;
     bool avoidWalls, interactWithBodies, drawBodies, drawFlock, drawPreds, interactWithPredators;
     float separationF, cohesionF, alignF, dragF, personalSpace, boidPerception, predPerception, predSpeed, predForce, boidForce, boidSpeed, evadeForce;
+    ofFloatColor	boidColor;
     
     Flock() {
         
@@ -62,6 +63,7 @@ public:
             boids[i].reset = reset;
             boids[i].interactWithBodies = interactWithBodies;
             boids[i].interactWithPredators = interactWithPredators;
+            boids[i].boidColor = boidColor;
         }
     }
     

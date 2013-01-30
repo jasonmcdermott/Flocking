@@ -27,8 +27,11 @@ public:
     }
     
     void draw() {
-        ofSetColor(mass);
-        ofSphere(pos.x,pos.y,pos.z,radius);
+        ofPushMatrix();
+        ofTranslate(pos.x,pos.y,pos.z);
+        ofSetColor(255);
+        ofSphere(0,0,0,radius);
+        ofPopMatrix();
     }
 };
 

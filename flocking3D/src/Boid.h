@@ -6,7 +6,7 @@
 class Boid {
 public:
     
-    ofVec3f pos, vel, acc,ali,coh,sep, origin;
+    ofVec3f pos, vel, acc,ali,coh,sep, origin, bias;
     float personalSpace, boidPerception, predPerception;
     bool avoidWalls = true;
     ofVec3f other, dist;
@@ -28,6 +28,7 @@ public:
     bool isDead, interactWithBodies, interactWithPredators;
     bool reset = false, updatePrey;
     int age, type, prey;
+    ofFloatColor	boidColor;
     
     Boid() {
         
@@ -48,6 +49,7 @@ public:
         pos.set(origin);
         vel.set(0,0,0);
         acc.set(0,0,0);
+        bias.set(0,0,0);
         personalSpace = 15;
         c = 255;
         separationF = 1;
@@ -223,6 +225,7 @@ public:
     }
 
     void move() {
+        acc += bias;
         vel += acc;
         if (type == 0){
             vel.limit(boidSpeed);
@@ -241,12 +244,13 @@ public:
             ofPushMatrix();
             ofTranslate(pos.x,pos.y,pos.z);
             if (type == 0) {
-                ofSetColor(0,0,200);
+                ofSetColor(boidColor);
             } else if (type == 1) {
                 ofSetColor(200,0,0);
                 ofDrawBitmapString(ofToString(type,0),5,10);                
             }
-            ofBox(0,0,0,sc);
+            ofSphere(0,0,0,sc);
+//            ofBox(0,0,0,sc);
 
             ofPopMatrix();
         }
