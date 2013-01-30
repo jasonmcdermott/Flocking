@@ -6,6 +6,8 @@ void testApp::setup(){
     ofSetFrameRate(60);
     tick = 0.0001;
     ofBackground(0);
+    snapCounter = 0;
+	memset(snapString, 0, 255);		// clear the string by setting all chars to 0
     
     
     personalSpace = 1;
@@ -68,6 +70,7 @@ void testApp::draw(){
     if (guiDraw) gui.draw();
     ofSetColor(255,200);
     ofDrawBitmapString("Hit 'g' to toggle GUI", 20,ofGetHeight()-20);
+    snapFrame();
 }
 
 void testApp::updateGUI() {
@@ -127,17 +130,20 @@ void testApp::setupGUI() {
     gui.addSlider("Camera Position X", camPos.x, -2000, 2000);
     gui.addSlider("Camera Position Y", camPos.y, -2000, 2000);
     gui.addSlider("Camera Position Z", camPos.z, -2000, 2000);
-
-
-
-
-
 }
 
 void testApp::keyPressed(int key){
     if (key == 'g') {
         guiDraw = !guiDraw;
     }
+}
+
+void testApp::snapFrame() {
+    if (ofGetFrameNum() % 300 == 0){
+		img.grabScreen(0,0,ofGetWidth(),ofGetHeight());
+		string fileName = "../../../../images/flocking3D_"+ofGetTimestampString()+".png";
+		img.saveImage(fileName);
+	}
 }
 
 void testApp::keyReleased(int key){}

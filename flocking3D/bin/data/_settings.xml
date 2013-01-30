@@ -1,8 +1,4 @@
 <controls>
-    <Toggle_Avoid_Walls>
-        <name>Avoid Walls</name>
-        <value>1</value>
-    </Toggle_Avoid_Walls>
     <SliderFloat_Separation>
         <name>Separation</name>
         <value>7.500000000</value>
@@ -54,6 +50,10 @@
         <name>Interact with Predators</name>
         <value>0</value>
     </Toggle_Interact_with_Predators>
+    <Toggle_Avoid_Walls>
+        <name>Avoid Walls</name>
+        <value>1</value>
+    </Toggle_Avoid_Walls>
     <SliderFloat_Predator_Speed>
         <name>Predator Speed</name>
         <value>2.673999786</value>

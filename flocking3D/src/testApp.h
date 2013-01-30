@@ -6,6 +6,7 @@
 #include "ofxSimpleGuiToo.h"
 #include "ofCamera.h"
 #include "ofxBody.h"
+#include <time.h> 
 
 #define ATTRACT 0
 #define REPEL 1
@@ -25,6 +26,12 @@ class testApp : public ofBaseApp{
 		void windowResized(int w, int h);
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
+        void snapFrame();
+    
+    ofImage 			img;
+    int snapCounter;
+    char 				snapString[255];
+    
     void setupGUI();
     void updateGUI();
     
@@ -45,5 +52,7 @@ class testApp : public ofBaseApp{
     float separationF, cohesionF, alignF, dragF, personalSpace, boidPerception, predPerception, maxForce, maxSpeed;
     float worldSize;
     bool camDraw;
+    
+
     
 };
