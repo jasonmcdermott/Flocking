@@ -1,7 +1,7 @@
 <controls>
     <SliderFloat_Separation>
         <name>Separation</name>
-        <value>2.325000048</value>
+        <value>13.875000000</value>
     </SliderFloat_Separation>
     <SliderFloat_Cohesion>
         <name>Cohesion</name>
@@ -9,15 +9,15 @@
     </SliderFloat_Cohesion>
     <SliderFloat_Alignment>
         <name>Alignment</name>
-        <value>0.425000012</value>
+        <value>0.825000048</value>
     </SliderFloat_Alignment>
     <SliderFloat_Boid_Perception>
         <name>Boid Perception</name>
-        <value>63.375000000</value>
+        <value>25.950000763</value>
     </SliderFloat_Boid_Perception>
     <SliderFloat_PersonalSpace>
         <name>PersonalSpace</name>
-        <value>9.910000801</value>
+        <value>22.780000687</value>
     </SliderFloat_PersonalSpace>
     <SliderFloat_Boid_Force>
         <name>Boid Force</name>
@@ -25,18 +25,18 @@
     </SliderFloat_Boid_Force>
     <SliderFloat_Boid_Speed>
         <name>Boid Speed</name>
-        <value>7.425999641</value>
+        <value>1.832499981</value>
     </SliderFloat_Boid_Speed>
     <SliderFloat_Drag>
         <name>Drag</name>
-        <value>0.923500001</value>
+        <value>0.464499980</value>
     </SliderFloat_Drag>
     <ColorPicker_Boid_Color>
         <name>Boid Color</name>
         <values_0>1.000000000</values_0>
         <values_1>0.189999998</values_1>
         <values_2>0.574999988</values_2>
-        <values_3>0.800000012</values_3>
+        <values_3>1.000000000</values_3>
     </ColorPicker_Boid_Color>
     <SliderFloat_Evade_Force>
         <name>Evade Force</name>
@@ -44,11 +44,11 @@
     </SliderFloat_Evade_Force>
     <Toggle_Interact_with_Bodies>
         <name>Interact with Bodies</name>
-        <value>1</value>
+        <value>0</value>
     </Toggle_Interact_with_Bodies>
     <Toggle_Interact_with_Predators>
         <name>Interact with Predators</name>
-        <value>1</value>
+        <value>0</value>
     </Toggle_Interact_with_Predators>
     <Toggle_Avoid_Walls>
         <name>Avoid Walls</name>
@@ -56,7 +56,7 @@
     </Toggle_Avoid_Walls>
     <SliderFloat_Predator_Speed>
         <name>Predator Speed</name>
-        <value>1.733500004</value>
+        <value>0.941500008</value>
     </SliderFloat_Predator_Speed>
     <SliderFloat_Predator_Force>
         <name>Predator Force</name>
@@ -88,7 +88,7 @@
     </Toggle_Draw_Flock>
     <Toggle_Draw_Predators>
         <name>Draw Predators</name>
-        <value>1</value>
+        <value>0</value>
     </Toggle_Draw_Predators>
     <Toggle_Reset_Boids>
         <name>Reset Boids</name>
@@ -96,14 +96,14 @@
     </Toggle_Reset_Boids>
     <SliderFloat_Camera_Position_X>
         <name>Camera Position X</name>
-        <value>100.000000000</value>
+        <value>-580.000000000</value>
     </SliderFloat_Camera_Position_X>
     <SliderFloat_Camera_Position_Y>
         <name>Camera Position Y</name>
-        <value>300.000000000</value>
+        <value>420.000000000</value>
     </SliderFloat_Camera_Position_Y>
     <SliderFloat_Camera_Position_Z>
         <name>Camera Position Z</name>
-        <value>-40.000000000</value>
+        <value>0.000000000</value>
     </SliderFloat_Camera_Position_Z>
 </controls>

@@ -26,10 +26,10 @@ void testApp::setup(){
     camPos.set(ofGetWidth()/2, ofGetHeight()/2, worldSize*2);
     
 
-    bodies.push_back(ofxBody( ofVec3f(centre), 90, ATTRACT));
+    bodies.push_back(ofxBody( ofVec3f(centre), 30, ATTRACT));
     outer.setDims(centre,worldSize);
     
-    flock.addBoids(100, outer, centre,0);
+    flock.addBoids(200, outer, centre,0);
     flock.addBoids(1, outer, centre, 1);
     
     gui.loadFromXML();
