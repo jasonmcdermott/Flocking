@@ -14,10 +14,12 @@ public:
     bool avoidWalls, interactWithBodies, drawBodies, drawFlock, drawPreds, interactWithPredators;
     float separationF, cohesionF, alignF, dragF, personalSpace, boidPerception, predPerception, predSpeed, predForce, boidForce, boidSpeed, evadeForce;
     ofFloatColor	boidColor;
-    bool renderVA = true;
+    bool renderVA = true, flock, drawBounds;
+    ofVec3f circleLocation;
+    float circleRadius;
     
     Flock() {
-        
+        circleLocation.set(0,0,0);
     }
     
     void update(Boundary outer, vector <ofxBody> bodies) {
@@ -77,6 +79,12 @@ public:
                 boids[i].render();
             }
         }
+        
+        if (drawBounds) {
+            ofNoFill();
+            ofSetColor(255);
+            ofSphere(circleLocation,circleRadius*0.55);
+        }
 
     }
     
@@ -106,6 +114,9 @@ public:
             boids[i].interactWithPredators = interactWithPredators;
             boids[i].boidColor = boidColor;
             boids[i].renderVA = renderVA;
+            boids[i].circleRadius = circleRadius;
+            boids[i].flock = flock;
+            boids[i].circleLocation.set(circleLocation);
         }
     }
     

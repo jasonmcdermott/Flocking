@@ -1,7 +1,7 @@
 <controls>
     <SliderFloat_Separation>
         <name>Separation</name>
-        <value>13.875000000</value>
+        <value>7.500000000</value>
     </SliderFloat_Separation>
     <SliderFloat_Cohesion>
         <name>Cohesion</name>
@@ -9,15 +9,15 @@
     </SliderFloat_Cohesion>
     <SliderFloat_Alignment>
         <name>Alignment</name>
-        <value>0.825000048</value>
+        <value>0.625000000</value>
     </SliderFloat_Alignment>
     <SliderFloat_Boid_Perception>
         <name>Boid Perception</name>
-        <value>25.950000763</value>
+        <value>272.955017090</value>
     </SliderFloat_Boid_Perception>
     <SliderFloat_PersonalSpace>
         <name>PersonalSpace</name>
-        <value>22.780000687</value>
+        <value>11.890000343</value>
     </SliderFloat_PersonalSpace>
     <SliderFloat_Boid_Force>
         <name>Boid Force</name>
@@ -25,7 +25,7 @@
     </SliderFloat_Boid_Force>
     <SliderFloat_Boid_Speed>
         <name>Boid Speed</name>
-        <value>1.832499981</value>
+        <value>3.614499569</value>
     </SliderFloat_Boid_Speed>
     <SliderFloat_Drag>
         <name>Drag</name>
@@ -54,9 +54,13 @@
         <name>Avoid Walls</name>
         <value>1</value>
     </Toggle_Avoid_Walls>
+    <Toggle_Flock>
+        <name>Flock</name>
+        <value>1</value>
+    </Toggle_Flock>
     <SliderFloat_Predator_Speed>
         <name>Predator Speed</name>
-        <value>0.941500008</value>
+        <value>1.386999965</value>
     </SliderFloat_Predator_Speed>
     <SliderFloat_Predator_Force>
         <name>Predator Force</name>
@@ -68,7 +72,7 @@
     </SliderFloat_Predator_Perception>
     <SliderFloat_TimeSpeed>
         <name>TimeSpeed</name>
-        <value>1.000000000</value>
+        <value>0.985000014</value>
     </SliderFloat_TimeSpeed>
     <SliderFloat_Size>
         <name>Size</name>
@@ -76,7 +80,7 @@
     </SliderFloat_Size>
     <Toggle_Draw_Bounds>
         <name>Draw Bounds</name>
-        <value>1</value>
+        <value>0</value>
     </Toggle_Draw_Bounds>
     <Toggle_Draw_Bodies>
         <name>Draw Bodies</name>
@@ -94,16 +98,20 @@
         <name>Reset Boids</name>
         <value>0</value>
     </Toggle_Reset_Boids>
+    <SliderFloat_outerBounds>
+        <name>outerBounds</name>
+        <value>225.750000000</value>
+    </SliderFloat_outerBounds>
     <SliderFloat_Camera_Position_X>
         <name>Camera Position X</name>
-        <value>-580.000000000</value>
+        <value>240.000000000</value>
     </SliderFloat_Camera_Position_X>
     <SliderFloat_Camera_Position_Y>
         <name>Camera Position Y</name>
-        <value>420.000000000</value>
+        <value>260.000000000</value>
     </SliderFloat_Camera_Position_Y>
     <SliderFloat_Camera_Position_Z>
         <name>Camera Position Z</name>
-        <value>0.000000000</value>
+        <value>-120.000000000</value>
     </SliderFloat_Camera_Position_Z>
 </controls>

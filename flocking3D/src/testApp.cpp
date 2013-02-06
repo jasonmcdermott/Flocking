@@ -3,12 +3,14 @@
 
 
 void testApp::setup(){
+
+    saveFrame = true;
+    
     ofSetFrameRate(60);
     tick = 0.0001;
     ofBackground(0);
     snapCounter = 0;
 	memset(snapString, 0, 255);		// clear the string by setting all chars to 0
-    
     
     personalSpace = 1;
     guiDraw = false;
@@ -31,6 +33,7 @@ void testApp::setup(){
     
     flock.addBoids(200, outer, centre,0);
     flock.addBoids(1, outer, centre, 1);
+    flock.circleLocation.set(centre);
     
     gui.loadFromXML();
 	
@@ -63,7 +66,12 @@ void testApp::draw(){
         }
     }
 
-    if (drawBounds) outer.draw();
+    if (drawBounds == true) {
+        outer.draw();
+        flock.drawBounds = true;
+    } else {
+        flock.drawBounds = false;
+    }
 
 
 //    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
@@ -116,6 +124,7 @@ void testApp::setupGUI() {
     gui.addToggle("Interact with Bodies", flock.interactWithBodies);
     gui.addToggle("Interact with Predators", flock.interactWithPredators);
     gui.addToggle("Avoid Walls", flock.avoidWalls);
+    gui.addToggle("Flock", flock.flock);
     
     gui.addTitle("Predators").setNewColumn(true);
     gui.addSlider("Predator Speed",flock.predSpeed,0.1,10);
@@ -130,6 +139,7 @@ void testApp::setupGUI() {
     gui.addToggle("Draw Flock", flock.drawFlock);
     gui.addToggle("Draw Predators", flock.drawPreds);
     gui.addToggle("Reset Boids", flock.reset);
+    gui.addSlider("outerBounds",flock.circleRadius,50,1000);
     
     gui.addTitle("Camera").setNewColumn(true);
     gui.addSlider("Camera Position X", camPos.x, -2000, 2000);
@@ -144,7 +154,8 @@ void testApp::keyPressed(int key){
 }
 
 void testApp::snapFrame() {
-    if (ofGetFrameNum() % 900 == 0){
+    
+    if (ofGetFrameNum() % 900 == 0 && saveFrame == true){
 		img.grabScreen(0,0,ofGetWidth(),ofGetHeight());
 		string fileName = "../../../../images/flocking3D_"+ofGetTimestampString()+".png";
 		img.saveImage(fileName);

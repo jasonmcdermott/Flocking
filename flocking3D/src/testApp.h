@@ -8,6 +8,7 @@
 #include "ofxBody.h"
 #include <time.h> 
 
+
 #define ATTRACT 0
 #define REPEL 1
 
@@ -42,7 +43,7 @@ class testApp : public ofBaseApp{
     bool smoothEdges;
     float time, tick;
     
-    bool guiDraw, drawBounds;
+    bool guiDraw, drawBounds, saveFrame;
     
 
     ofCamera cam;

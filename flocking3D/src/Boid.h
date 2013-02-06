@@ -6,7 +6,7 @@
 class Boid {
 public:
     
-    ofVec3f pos, vel, acc,ali,coh,sep, origin, bias;
+    ofVec3f pos, vel, acc, ali, coh, sep, origin, bias;
     float personalSpace, boidPerception, predPerception;
     bool avoidWalls = true;
     ofVec3f other, dist;
@@ -21,7 +21,7 @@ public:
     float flap = 0;
     float t = 0;
     int ID;
-    int randomPrey;
+    bool randomPrey = false;
     string a;
     ofVec3f outerTemp;
     float separationF, alignF, cohesionF, dragF, mass;
@@ -29,6 +29,10 @@ public:
     bool reset = false, updatePrey, renderVA = true;
     int age, type, prey, trailCount = 0;
     ofFloatColor	boidColor;
+    bool flock;
+    ofVec3f circleLocation;
+    float circleRadius;
+
     
     
     // LAMARCHE SPHERICAL COMPONENTS
@@ -64,7 +68,9 @@ public:
     }
 
     void initBoid(Boundary outer) {
-        origin.set(origin.x + ofRandom(-outer.halfLength,outer.halfLength),origin.y + ofRandom(-outer.halfLength,outer.halfLength),origin.z+ ofRandom(-outer.halfLength,outer.halfLength));
+//        origin.set(origin.x + ofRandom(-outer.halfLength,outer.halfLength),origin.y + ofRandom(-outer.halfLength,outer.halfLength),origin.z+ ofRandom(-outer.halfLength,outer.halfLength));
+        
+        origin.set(origin.x + ofRandom(-10,10),origin.y + ofRandom(-10,10) ,origin.z + ofRandom(-10,10));
         isDead = false;
         age = 0;
         mass = 1;
@@ -79,6 +85,7 @@ public:
         dragF = 0.95;
         a = "";
         M_PI_Divided_By_180 = M_PI/180;
+        circleLocation.set(0,0,0);
 
 
 
@@ -103,22 +110,28 @@ public:
         }
         if (isDead != true) {
             age ++;
-            if (type == 0) {
-                if (interactWithBodies == true) {
-                    interactingBodies(bodies);
+            if (checkIfWithinCircle() == true) {
+                if (type == 0) {
+                    if (interactWithBodies == true) {
+                        interactingBodies(bodies);
+                    }
                 }
-            }
-            if (interactWithPredators) {
-                if (type == 1) {
+                if (interactWithPredators) {
+                    if (type == 1) {
+                    }
                 }
-            }
-            if (avoidWalls) {
-                avoidBounds(outer);
-                killStrays(outer);
+                if (flock == true) {
+                    flocking(boids);
+                }
             } else {
-                checkBounds(outer);
+                stayWithinCircle();
+                if (avoidWalls) {
+                    avoidBounds(outer);
+                    killStrays(outer);
+                } else {
+                    checkBounds(outer);
+                }
             }
-            flock(boids);
             move();
         }
     }
@@ -158,7 +171,7 @@ public:
         }
     }
 
-    void flock(vector <Boid> boids) {
+    void flocking(vector <Boid> boids) {
         ali = alignment(boids);
         sep = separation(boids);
         coh = cohesion(boids);
@@ -398,6 +411,81 @@ public:
         acc += avFront;
         acc += avBack;
     }
+    
+    bool checkIfWithinCircle() {
+
+        
+        // Predict location 5 (arbitrary choice) frames ahead
+        ofVec3f predict(vel);
+        predict *= 25;
+        ofVec3f futureLocation(pos);
+        
+        futureLocation += predict;
+        
+        ofVec3f distFromCircleCentre(circleLocation);
+        
+        distFromCircleCentre -= futureLocation;
+        
+        float distance = distFromCircleCentre.length();
+
+        if (distance > circleRadius * 0.6) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+    
+    void stayWithinCircle() {
+        
+//        ofVec3f desired;
+//        
+//        // Predict location 5 (arbitrary choice) frames ahead
+//        ofVec3f predict(vel);
+//        predict *= 25;
+//        ofVec3f futureLocation(pos);
+//        
+//        futureLocation += predict;
+//        
+//        ofVec3f distFromCircleCentre(circleLocation);
+//        
+//        distFromCircleCentre -= futureLocation;
+//        
+//        float distance = distFromCircleCentre.length();
+            ofVec3f desired;        
+//        if (distance > circleRadius * 0.6) {
+
+            ofVec3f toCenter(circleLocation);
+            toCenter -= pos;
+            toCenter.normalize();
+            toCenter *= vel.length();
+            toCenter += vel;
+            
+            desired.set(toCenter);
+            desired.normalize();
+            if (type == 0) {
+                desired *= boidSpeed;
+            } else {
+                desired *= predSpeed;
+            }
+//        }
+        
+        if (desired.length() != 0) {
+            ofVec3f steer(desired);
+            steer -= vel;
+            //            PVector steer = PVector.sub(desired, velocity);
+            if (type == 0) {
+                steer.limit(boidForce);
+            } else {
+                steer.limit(predForce);
+            }
+            acc += steer;
+        }
+        
+        //        ofSetColor(255,0,0);
+        //        ofCircle(futureLocation.x,futureLocation.y,4,4);
+        
+    }
+
     
     ofVec3f steer(ofVec3f target,bool arrival) {
         ofVec3f steer;
